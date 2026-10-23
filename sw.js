@@ -39,6 +39,8 @@ self.addEventListener('fetch', e => {
   // страницу (переход) нельзя пересоздать с настройками — беру её адрес
   const fresh = e.request.mode === 'navigate' ? new Request(e.request.url, { cache: 'no-cache', credentials: 'same-origin' }) : new Request(e.request, { cache: 'no-cache' });
   e.respondWith(fetch(fresh).then(res => {
+    // хостинг перенаправил страницу (Cloudflare убирает .html) — браузер не примет такой ответ на переход, отдаю переадресацию
+    if (e.request.mode === 'navigate' && res.redirected) return Response.redirect(res.url, 301);
     if (res.ok) { const copy = res.clone(); caches.open('shell-' + VERSION).then(c => c.put(e.request, copy)); }
     return res;
   }).catch(() => caches.match(e.request, { ignoreSearch: false }).then(r => r || caches.match('index.html'))));
