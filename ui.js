@@ -154,6 +154,28 @@ function openBuySheet(name) {
   $('[data-city-change]', $('#sheet')).addEventListener('click', () => openCitySheet(false));
 }
 
+// «Заказать недостающее»: выбранный сервис доставки + ссылка на поиск каждого продукта.
+// Положить всю корзину одной ссылкой сервисы не дают — поэтому по продукту на нажатие
+function openOrderSheet(names, title, sub = '') {
+  const shops = shopLinks('').filter(x => !x.map);
+  if (!shops.length) { openBuySheet(names[0]); return; }
+  let pick = '';
+  try { pick = localStorage.getItem('cook.shop') || ''; } catch { /* ничего */ }
+  const cur = shops.find(x => x.n === pick) || shops[0];
+  const url = n => shopLinks(n).find(x => x.n === cur.n).url;
+  track('order', { shop: cur.n, n: names.length });
+  openSheet(`
+    <div class="sheet-head"><h3>${esc(title)}</h3><button class="close" data-close aria-label="Закрыть">×</button></div>
+    ${sub ? `<p><b>${esc(sub)}</b></p>` : ''}
+    <p class="muted small">Где заказать — запомню выбор. Нажмите на продукт: откроется поиск в магазине, добавьте в корзину и возвращайтесь за следующим</p>
+    <div class="chips">${shops.map(x => `<button type="button" class="chip${x.n === cur.n ? ' on' : ''}" data-shop="${esc(x.n)}">${esc(x.n)}</button>`).join('')}</div>
+    ${cur.far ? '<p class="small muted">Этот сервис работает не во всех городах. Если вашего нет — выберите другой</p>' : ''}
+    <div class="shop-links">${names.map(n => `<a href="${esc(url(n))}" target="_blank" rel="noopener" data-done>${esc(n)}<span>${esc(cur.note)}</span></a>`).join('')}</div>`);
+  const sh = $('#sheet');
+  $$('[data-shop]', sh).forEach(b => b.addEventListener('click', () => { try { localStorage.setItem('cook.shop', b.dataset.shop); } catch { /* ничего */ } openOrderSheet(names, title, sub); }));
+  $$('[data-done]', sh).forEach(a => a.addEventListener('click', () => a.classList.add('done')));
+}
+
 // ---------- Общие куски ----------
 const coef = () => regionCoef(S.city);
 const priceOn = () => showPrice(S.city);
@@ -687,7 +709,7 @@ function drawRecipe(r) {
         <p class="small muted">${curServ} ${plural(curServ, 'порция', 'порции', 'порций')}${curServ !== r.serv ? ` (в оригинале ${r.serv}), количество пересчитано` : ''}${priceOn() && r.cost ? ` · всё блюдо ≈ ${fmtRub(r.cost * coef() * curServ * panK)}` : ''}</p>
         ${panHTML(r)}
         <ul class="ings">${ingRows}</ul>
-        ${missing.length ? `<button class="btn primary" type="button" id="toList">Добавить ${missing.length} в список покупок</button>` : H.size ? '<div class="notice ok">Всё нужное у вас есть</div>' : ''}
+        ${missing.length ? `<div class="row"><button class="btn primary" type="button" id="toList">Добавить ${missing.length} в список покупок</button><button class="btn" type="button" id="orderMiss">Заказать недостающее</button></div>` : H.size ? '<div class="notice ok">Всё нужное у вас есть</div>' : ''}
         <h3>БЖУ</h3>
         <div class="seg" role="group" aria-label="БЖУ на">${[['serv', 'на порцию'], ['all', 'на всё блюдо'], ['100', 'на 100 г']].map(([v, n]) => `<button type="button" data-nm="${v}" class="${nutMode === v ? 'on' : ''}">${n}</button>`).join('')}</div>
         <div class="nutr"><div><b>${Math.round(nut[0])}</b><span>ккал</span></div><div><b>${fmtN(nut[1])}</b><span>белки, г</span></div><div><b>${fmtN(nut[2])}</b><span>жиры, г</span></div><div><b>${fmtN(nut[3])}</b><span>углеводы, г</span></div></div>
@@ -768,6 +790,7 @@ function bindRecipe(r) {
     if (b.dataset.nm) { nutMode = b.dataset.nm; drawRecipe(r); loadGallery(r); return; }
     if (b.dataset.pan) { panD = +b.dataset.pan; panK = panD ? (panD / 22) ** 2 : 1; drawRecipe(r); loadGallery(r); return; }
     if (b.dataset.buy) { openBuySheet(b.dataset.buy); return; }
+    if (b.id === 'orderMiss') { const H = haveSet(S); openOrderSheet(r.items.filter(it => !it.opt && itemStatus(it.id, H).s === 'miss').map(it => ING[it.id].n), 'Заказать недостающее', r.t); return; }
     if (b.dataset.timer) { startTimer(+b.dataset.timer, b.dataset.label, b.dataset.rid); e.stopPropagation(); return; }
     if (b.dataset.star) { const n = +b.dataset.star; setNote(r.id, { s: (S.notes[r.id] || {}).s === n ? 0 : n }); $$('[data-star]', root).forEach(x => x.classList.toggle('on', (S.notes[r.id].s || 0) >= +x.dataset.star)); return; }
     if (b.matches('li[data-step]')) { b.classList.toggle('done'); return; }
@@ -939,7 +962,7 @@ function renderList() {
         <span class="nm">${esc(name2)}${qty ? ' · ' + esc(qty) : ''}${x.from && x.from.length ? `<small>для: ${esc(x.from.join(', '))}</small>` : ''}</span>
         <button class="btn sm" type="button" data-buy="${esc(name2)}">Где купить</button></li>`;
       }).join('')}</ul>`).join('')}
-    <div class="row"><button class="btn sm" type="button" id="shareList">Отправить список</button><button class="btn sm" type="button" id="clearGot">Убрать купленное</button><button class="btn sm ghost" type="button" id="clearAll">Очистить всё</button></div></section>`
+    <div class="row"><button class="btn sm primary" type="button" id="orderList">Заказать всё</button><button class="btn sm" type="button" id="shareList">Отправить список</button><button class="btn sm" type="button" id="clearGot">Убрать купленное</button><button class="btn sm ghost" type="button" id="clearAll">Очистить всё</button></div></section>`
     : `<div class="empty">${EMPTY_SVG.list}<p>Список пуст. Откройте рецепт или меню на неделю и нажмите «Добавить в список покупок» — туда попадёт только то, чего нет дома</p><div class="row"><a class="btn primary" href="#/">Подобрать рецепт</a><a class="btn" href="#/plan">Меню на неделю</a></div></div>`}
   </div>`;
   $('#addItem').addEventListener('submit', e => {
@@ -966,6 +989,7 @@ function renderList() {
     try { if (navigator.share) await navigator.share({ title: 'Список покупок', text }); else { await navigator.clipboard.writeText(text); toast('Список скопирован, вставьте его в мессенджер'); } } catch { /* отмена */ }
   });
   on('#clearGot', () => { S.list = S.list.filter(x => !x.got); save(); updateBadge(); renderList(); });
+  on('#orderList', () => openOrderSheet(S.list.filter(x => !x.got).map(x => x.id ? ING[x.id].n : x.n), 'Заказать по списку'));
   on('#clearAll', () => { if (confirm('Очистить весь список?')) { S.list = []; save(); updateBadge(); renderList(); } });
   $$('[data-buy]', app).forEach(b => b.addEventListener('click', () => openBuySheet(b.dataset.buy)));
 }

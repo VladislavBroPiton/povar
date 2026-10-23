@@ -588,3 +588,7 @@ html.big .btn { min-height: 48px; }
   .tip, .drinks { padding: 6px 10px; break-inside: avoid; }
   .r-head::after { content: "Что приготовить · vladislavbropiton.github.io/povar"; font-size: 8pt; color: var(--muted); }
 }
+
+/* заказ недостающего: уже открытые продукты приглушаются */
+.shop-links a.done { opacity: .5; }
+.shop-links a.done::after { content: ' ✓'; color: var(--accent); }
