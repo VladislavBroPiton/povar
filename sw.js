@@ -3,7 +3,7 @@ const VERSION = 'v7';
 // кэш фото не зависит от версии: после обновления сайта картинки не скачиваются заново
 const IMG_CACHE = 'img-cache';
 const SHELL = [
-  './', 'index.html', 'app.css?v=7', 'config.js?v=7', 'core.js?v=7', 'i18n.js?v=7', 'data/i18n-en.js?v=7', 'ui.js?v=7', 'online.js?v=7', 'extra.js?v=7', 'manifest.webmanifest',
+  './', 'index.html', 'app.css?v=7', 'config.js?v=7', 'core.js?v=7', 'i18n.js?v=7', 'data/i18n-en.js?v=7', 'ui.js?v=7', 'online.js?v=7', 'extra.js?v=7', 'more.js?v=7', 'manifest.webmanifest',
   'data/ingredients.js?v=7', 'data/cities.js?v=7', 'data/recipes.js?v=7', 'data/help.js?v=7', 'data/steps.js?v=7',
   'icons/icon-192.png', 'icons/icon-512.png'
 ];

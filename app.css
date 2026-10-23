@@ -479,6 +479,21 @@ h3.dept { font-size: var(--fs-s); color: var(--muted); margin-top: 8px; }
 .step-video { width: 100%; max-width: 640px; aspect-ratio: 4 / 3; border-radius: var(--r-sm); background: #000; }
 @media print { .step-img { max-width: 34mm; float: right; margin: 0 0 4px 8px; } .step-video { display: none; } }
 
+/* Таймер в Telegram, форма, отзывы, крупный шрифт */
+.tg-timer { text-decoration: none; font-size: 18px; line-height: 1; padding: 2px 4px; }
+.pan { display: grid; gap: 6px; }
+.comments .cm { display: grid; gap: 4px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+.comments .cm img { max-width: 260px; border-radius: var(--r-sm); }
+.comments details > summary { list-style: none; width: max-content; }
+.comments details > summary::-webkit-details-marker { display: none; }
+.cm-form { display: grid; gap: 10px; margin-top: 10px; max-width: 560px; }
+.qty-in { width: 80px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 4px 6px; }
+.dates .row { gap: 6px; flex-wrap: nowrap; }
+html.big body { font-size: 19px; }
+html.big .steps li p, html.big .ings li { font-size: 20px; }
+html.big .cook-step p { font-size: clamp(26px, 5vw, 40px); }
+html.big .btn { min-height: 48px; }
+
 /* Планшет и компьютер */
 @media (min-width: 720px) {
   .page { padding: 24px; }

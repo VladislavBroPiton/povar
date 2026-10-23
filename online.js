@@ -42,7 +42,7 @@ const nl2br = s => esc(s).replace(/\n/g, '<br>');
 // ---------- Места в интерфейсе ----------
 function onlineHeroHTML() {
   if (!API) return '';
-  return `<div class="row ai-row"><button class="btn" type="button" data-act="ask">💬 Спросить повара</button><button class="btn" type="button" data-act="airecipe">✨ Придумать рецепт из моих продуктов</button></div>`;
+  return `<div class="row ai-row"><button class="btn" type="button" data-act="ask">💬 Спросить повара</button><button class="btn" type="button" data-act="airecipe">✨ Придумать рецепт из моих продуктов</button><label class="btn">📸 Что это за блюдо?<input type="file" accept="image/*" data-act="dish" hidden></label></div>`;
 }
 function onlinePhotoHTML() {
   if (!API) return '';

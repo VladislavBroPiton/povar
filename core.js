@@ -66,8 +66,12 @@ const COLLS = {
   pesach: { n: 'Песах', note: 'Без квасного: без муки, хлеба, дрожжей и макарон. Проверяйте маркировку продуктов', test: r => hasOcc(r, 'pesach') || (r.diet.kosher && !r.items.some(i => !i.opt && CHAMETZ.has(i.id))) },
   bday: { n: 'Детский праздник', test: r => hasOcc(r, 'bday') },
   picnic: { n: 'На природу, с собой', test: r => hasOcc(r, 'picnic') },
-  leftover: { n: 'Из вчерашних остатков', test: r => r.tags.includes('leftover') || r.items.some(i => LEFTOVER_IDS.has(i.id)) }
+  leftover: { n: 'Из вчерашних остатков', test: r => r.tags.includes('leftover') || r.items.some(i => LEFTOVER_IDS.has(i.id)) },
+  season: { n: 'В сезоне', note: 'Из овощей и фруктов, которые сейчас дешевле и вкуснее', test: r => r.items.some(i => !i.opt && SEASON_NOW.has(i.id) && ['veg', 'fruit', 'mushroom', 'greens'].includes(ING[i.id].cat)) },
+  cheap: { n: 'Недорого: до 80 ₽ порция', note: 'Примерная цена порции по средним ценам', test: r => r.cost > 0 && r.cost <= 80 && !r.own }
 };
+// продукты сезона — обновляет интерфейс под город и месяц
+const SEASON_NOW = new Set();
 
 // Какая кухня ближе жителям города
 const LOCAL_CUISINE = {
@@ -533,5 +537,5 @@ function qtyText(it, k) {
 function plural(n, a, b, c) { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; }
 
 if (typeof module !== 'undefined') {
-  module.exports = { allergens, drinks, similar, oneMore, ING, GROUPS, COLLS, CUISINES, buildRecipes, get RECIPES() { return RECIPES; }, get RBYID() { return RBYID; }, parsePhrase, compute, passes, makePlan, planTotals, replaceInPlan, easterDate, currentOccasions, expiring, qtyText, fmtGrams, fmtQty, deptOf, regionCoef, localCuisine, acSearch, plural };
+  module.exports = { SEASON_NOW, seasonNow, allergens, drinks, similar, oneMore, ING, GROUPS, COLLS, CUISINES, buildRecipes, get RECIPES() { return RECIPES; }, get RBYID() { return RBYID; }, parsePhrase, compute, passes, makePlan, planTotals, replaceInPlan, easterDate, currentOccasions, expiring, qtyText, fmtGrams, fmtQty, deptOf, regionCoef, localCuisine, acSearch, plural };
 }

@@ -203,6 +203,8 @@ const LEFTOVERS = ['rice_cooked', 'buckwheat_cooked', 'pasta_cooked', 'potato_bo
 // Иконки подборок: свои рисунки в фирменном цвете, с лёгкой анимацией у подборки «сейчас» и при наведении
 const ci = (cls, body) => `<svg class="ci ${cls}" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
 const COLL_ICON = {
+  season: ci('ci-sway', '<path d="M12 21c-4-3-6-6-6-10a6 6 0 0 1 12 0c0 4-2 7-6 10Z"/><path d="M12 21V9M12 13l3-3"/>'),
+  cheap: ci('ci-bounce', '<circle cx="12" cy="12" r="8"/><path d="M10 7v10M10 7h3a3 3 0 0 1 0 6h-4M8 15h5"/>'),
   newyear: ci('ci-twinkle', '<path d="M12 3 6 12h3l-4 6h14l-4-6h3z"/><path d="M12 18v3"/><circle class="spark" cx="12" cy="3" r="1.2"/>'),
   maslenitsa: ci('ci-steam', '<ellipse cx="12" cy="17" rx="8" ry="2.5"/><ellipse cx="12" cy="14" rx="7" ry="2.2"/><path class="st" d="M9 9c-1-1.5 1-2.5 0-4M13 9c-1-1.5 1-2.5 0-4"/>'),
   easter: ci('ci-wobble', '<path d="M12 3c3.5 0 6 5 6 9.5A6 6 0 0 1 6 12.5C6 8 8.5 3 12 3Z"/><path d="M6.5 12.5c2-1 3.5 1 5.5 0s3.5 1 5.5 0"/>'),
@@ -224,6 +226,7 @@ const EMPTY_SVG = {
 const EXAMPLES = ['ужин из курицы в духовке на 4', 'есть яйца, молоко и мука', 'высокобелковый завтрак', 'суп без мяса', 'на пару для ребёнка 1 год', 'кашерный ужин на 10 гостей', 'грузинская кухня', 'что сделать из вчерашнего риса'];
 let titleWords = [], lastNotice = '', shown = 24;
 function renderFind() {
+  SEASON_NOW.clear(); seasonNow(S.city).forEach(id => SEASON_NOW.add(id));
   const s = S.serv || 0;
   const now = currentOccasions();
   const collOrder = [...now, ...Object.keys(COLLS).filter(k => !now.includes(k))];
@@ -251,7 +254,7 @@ function renderFind() {
         <div class="ac"><input class="input" data-ac="have" placeholder="Добавить продукт: яйца, фарш…" autocomplete="off"><div class="ac-list" hidden></div></div>
         <div class="chips" data-tags="have">${tagsHTML('have')}</div>
         ${hook('onlinePhotoHTML')}
-        <button class="btn sm" type="button" id="datesBtn"${S.have.length ? '' : ' hidden'}>📅 Указать сроки годности</button>
+        <button class="btn sm" type="button" id="datesBtn"${S.have.length ? '' : ' hidden'}>📅 Сроки и количество</button>
         <div id="datesBox" hidden></div>
         <p class="small muted">Быстро добавить:</p>
         <div class="chips">${POPULAR.filter(t => !S.have.includes(t)).map(t => `<button type="button" class="chip" data-add-have="${t}">+ ${esc(tokenName(t))}</button>`).join('')}</div>
@@ -412,8 +415,9 @@ function addToken(field, t) {
 }
 function drawDates() {
   const box = $('#datesBox');
-  box.innerHTML = `<div class="dates">${S.have.filter(t => !GROUPS[t] || true).map(t => `<label><span>${esc(tokenName(t))}</span><input type="date" data-date="${esc(t)}" value="${esc(S.dates[t] || '')}"></label>`).join('')}</div>
-    <p class="small muted">Отметьте, что скоро испортится: такие продукты пойдут в дело первыми</p>`;
+  S.stock = S.stock || {};
+  box.innerHTML = `<div class="dates">${S.have.map(t => `<label><span>${esc(tokenName(t))}</span><span class="row"><input type="number" min="0" step="any" class="qty-in" data-stock="${esc(t)}" value="${S.stock[t] != null ? S.stock[t] : ''}" placeholder="сколько" aria-label="Сколько, г или шт"><small>${ING[t] && ING[t].pc ? 'шт' : 'г'}</small><input type="date" data-date="${esc(t)}" value="${esc(S.dates[t] || '')}"></span></label>`).join('')}</div>
+    <p class="small muted">Срок — что скоро испортится, пойдёт в дело первым. Количество — после «Я приготовил» сайт сам вычтет то, что ушло в блюдо</p>`;
 }
 function bindFind() {
   const root = $('.find');
@@ -461,6 +465,7 @@ function bindFind() {
     if (b.id === 'resetBtn') resetFilters();
   });
   root.addEventListener('change', e => {
+    if (e.target.dataset.stock !== undefined) { S.stock = S.stock || {}; const v = parseFloat(e.target.value); if (v > 0) S.stock[e.target.dataset.stock] = v; else delete S.stock[e.target.dataset.stock]; save(); return; }
     const t = e.target.dataset.date; if (t === undefined) return;
     if (e.target.value) S.dates[t] = e.target.value; else delete S.dates[t];
     save(); $('[data-tags="have"]').innerHTML = tagsHTML('have'); updateResults();
@@ -537,12 +542,12 @@ function listen() {
 }
 
 // ---------- Экран рецепта ----------
-let curServ = 0, nutMode = 'serv', wakeLock = null;
+let curServ = 0, nutMode = 'serv', wakeLock = null, panK = 1, panD = 0;
 function renderRecipe(id) {
   const r = RBYID[id];
   if (!r) { app.innerHTML = `<div class="page"><div class="empty">${EMPTY_SVG.pot}<p>Рецепт не найден</p><a class="btn" href="#/">К подбору</a></div></div>`; return; }
   curServ = S.serv || r.serv;
-  nutMode = 'serv';
+  nutMode = 'serv'; panK = 1; panD = 0;
   drawRecipe(r);
   document.title = r.t + ' — Что приготовить';
   loadGallery(r);
@@ -561,12 +566,12 @@ function dietBlocks(d, id, r) {
   }
   return false;
 }
-function stepTimers(s, label) {
+function stepTimers(s, label, rid) {
   return [...s.matchAll(/(?<![\d,.])(\d+(?:[.,]\d+)?)(?:\s*[-–]\s*\d+(?:[.,]\d+)?)?\s*(мин|час)/g)].slice(0, 2)
-    .map(m => { const min = Math.round(parseFloat(m[1].replace(',', '.')) * (m[2] === 'мин' ? 1 : 60)); return min > 0 && min <= 600 ? `<button class="btn sm" type="button" data-timer="${min}" data-label="${esc(label)}">⏱ ${min >= 60 ? (min % 60 ? Math.floor(min / 60) + ' ч ' + (min % 60) + ' мин' : min / 60 + ' ч') : min + ' мин'}</button>` : ''; }).join('');
+    .map(m => { const min = Math.round(parseFloat(m[1].replace(',', '.')) * (m[2] === 'мин' ? 1 : 60)); return min > 0 && min <= 600 ? `<button class="btn sm" type="button" data-timer="${min}" data-label="${esc(label)}" data-rid="${esc(rid || '')}">⏱ ${min >= 60 ? (min % 60 ? Math.floor(min / 60) + ' ч ' + (min % 60) + ' мин' : min / 60 + ' ч') : min + ' мин'}</button>` : ''; }).join('');
 }
 function drawRecipe(r) {
-  const k = curServ / r.serv;
+  const k = curServ / r.serv * panK;
   const H = haveSet(S);
   const c = S.city;
   const fav = S.fav.includes(r.id);
@@ -600,7 +605,7 @@ function drawRecipe(r) {
   }).join('');
   const nut = nutMode === 'serv' ? r.ps : nutMode === 'all' ? r.tot.map(v => v * k) : r.tot.map(v => v / Math.max(r.w, 1) * 100);
   const steps = r.steps.map((s, i) => {
-    const t = stepTimers(s, `${r.t}, шаг ${i + 1}`);
+    const t = stepTimers(s, `${r.t}, шаг ${i + 1}`, r.id);
     const im = stepImg(r.id, i);
     return `<li data-step="${i}"><div><p>${esc(s)}</p>${im ? `<img class="step-img" src="${esc(im)}" alt="" loading="lazy" decoding="async">` : ''}${t ? `<div class="row tm">${t}</div>` : ''}</div></li>`;
   }).join('');
@@ -640,7 +645,8 @@ function drawRecipe(r) {
       <section class="card">
         <div class="row" style="justify-content:space-between"><h2>Продукты</h2>
           <div class="stepper" aria-label="Порций"><button type="button" data-rs="-1" aria-label="Меньше порций">−</button><output>${curServ}</output><button type="button" data-rs="1" aria-label="Больше порций">+</button></div></div>
-        <p class="small muted">${curServ} ${plural(curServ, 'порция', 'порции', 'порций')}${curServ !== r.serv ? ` (в оригинале ${r.serv}), количество пересчитано` : ''}${priceOn() && r.cost ? ` · всё блюдо ≈ ${fmtRub(r.cost * coef() * curServ)}` : ''}</p>
+        <p class="small muted">${curServ} ${plural(curServ, 'порция', 'порции', 'порций')}${curServ !== r.serv ? ` (в оригинале ${r.serv}), количество пересчитано` : ''}${priceOn() && r.cost ? ` · всё блюдо ≈ ${fmtRub(r.cost * coef() * curServ * panK)}` : ''}</p>
+        ${panHTML(r)}
         <ul class="ings">${ingRows}</ul>
         ${missing.length ? `<button class="btn primary" type="button" id="toList">Добавить ${missing.length} в список покупок</button>` : H.size ? '<div class="notice ok">Всё нужное у вас есть</div>' : ''}
         <h3>БЖУ</h3>
@@ -667,12 +673,19 @@ function drawRecipe(r) {
         ${linksHTML(media)}
       </section>
     </div>
+    ${hook('commentsHTML', r)}
     ${similarHTML(r)}
   </article>`;
   bindRecipe(r);
 }
 // фото к шагу (ИИ-иллюстрации для популярных рецептов, data/steps.js)
 function stepImg(id, i) { const m = (window.STEP_MEDIA || {})[id]; const x = m && m.find(y => y.s === i); return x ? x.i : ''; }
+// пересчёт под размер круглой формы: рецепты выпечки рассчитаны на форму около 22 см
+function panHTML(r) {
+  if (!r.m.includes('oven') || !['bake', 'dessert'].includes(r.kind)) return '';
+  return `<div class="pan"><span class="small muted">Моя форма:</span><div class="chips">${[0, 18, 20, 22, 24, 26, 28].map(d => `<button type="button" class="chip${panD === d ? ' on' : ''}" data-pan="${d}">${d ? d + ' см' : 'как в рецепте'}</button>`).join('')}</div>
+    ${panD && panD !== 22 ? `<p class="small muted">Рецепт рассчитан на форму около 22 см. Для ${panD} см продукты ×${fmtN(panK)}, время в духовке ${panD > 22 ? 'чуть больше — проверяйте шпажкой' : 'на 5-10 минут меньше'}</p>` : ''}</div>`;
+}
 function drinksHTML(r) {
   const d = drinks(r, { noAlcohol: S.diets.includes('halal') || S.age > 0 || S.goals.includes('kids') });
   if (!d.soft.length && !d.wine.length) return '';
@@ -711,12 +724,13 @@ function bindRecipe(r) {
     if (b.dataset.back !== undefined) { e.preventDefault(); history.length > 1 ? history.back() : (location.hash = '#/'); return; }
     if (b.dataset.rs) { curServ = Math.max(1, Math.min(100, curServ + +b.dataset.rs)); drawRecipe(r); loadGallery(r); return; }
     if (b.dataset.nm) { nutMode = b.dataset.nm; drawRecipe(r); loadGallery(r); return; }
+    if (b.dataset.pan) { panD = +b.dataset.pan; panK = panD ? (panD / 22) ** 2 : 1; drawRecipe(r); loadGallery(r); return; }
     if (b.dataset.buy) { openBuySheet(b.dataset.buy); return; }
-    if (b.dataset.timer) { startTimer(+b.dataset.timer, b.dataset.label); e.stopPropagation(); return; }
+    if (b.dataset.timer) { startTimer(+b.dataset.timer, b.dataset.label, b.dataset.rid); e.stopPropagation(); return; }
     if (b.dataset.star) { const n = +b.dataset.star; setNote(r.id, { s: (S.notes[r.id] || {}).s === n ? 0 : n }); $$('[data-star]', root).forEach(x => x.classList.toggle('on', (S.notes[r.id].s || 0) >= +x.dataset.star)); return; }
     if (b.matches('li[data-step]')) { b.classList.toggle('done'); return; }
     if (b.id === 'cookBtn') { openCook(r); return; }
-    if (b.id === 'cookedBtn') { const c = ((S.notes[r.id] || {}).c || 0) + 1; setNote(r.id, { c, last: new Date().toISOString().slice(0, 10) }); b.textContent = `Я приготовил · ${c} ${plural(c, 'раз', 'раза', 'раз')}`; toast('Отметил. Приятного аппетита!'); return; }
+    if (b.id === 'cookedBtn') { const c = ((S.notes[r.id] || {}).c || 0) + 1; setNote(r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', r, curServ / r.serv * panK); b.textContent = `Я приготовил · ${c} ${plural(c, 'раз', 'раза', 'раз')}`; toast('Отметил. Приятного аппетита!'); return; }
     if (b.id === 'favBtn') { S.fav = S.fav.includes(r.id) ? S.fav.filter(x => x !== r.id) : [...S.fav, r.id]; save(); const on = S.fav.includes(r.id); b.classList.toggle('on-fav', on); b.textContent = on ? '♥ В избранном' : '♡ В избранное'; if (on) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300 }); return; }
     if (b.id === 'printBtn') { print(); return; }
     if (b.id === 'shareBtn') {
@@ -725,7 +739,7 @@ function bindRecipe(r) {
       return;
     }
     if (b.id === 'toList') {
-      const k = curServ / r.serv, H = haveSet(S);
+      const k = curServ / r.serv * panK, H = haveSet(S);
       const items = r.items.filter(it => !it.opt && itemStatus(it.id, H).s === 'miss').map(it => ({ id: it.id, g: it.g * k }));
       const n = addItemsToList(items, r.t);
       flyTo(b, '.tabs [data-tab="list"] svg');
@@ -767,7 +781,7 @@ async function loadGallery(r) {
 // ---------- Режим готовки: шаги на весь экран ----------
 let cookState = null;
 function openCook(r) {
-  const k = curServ / r.serv;
+  const k = curServ / r.serv * panK;
   const el = document.createElement('div');
   el.className = 'cook'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Готовим: ' + r.t);
   document.body.appendChild(el);
@@ -779,7 +793,7 @@ function openCook(r) {
   el.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.go) cookGo(+b.dataset.go);
-    else if (b.dataset.timer) startTimer(+b.dataset.timer, b.dataset.label);
+    else if (b.dataset.timer) startTimer(+b.dataset.timer, b.dataset.label, b.dataset.rid);
     else if (b.id === 'cookClose') closeCook();
     else if (b.id === 'cookIngs') { cookState.ings = !cookState.ings; drawCook(); }
   });
@@ -792,18 +806,19 @@ function drawCook() {
   const { r, i, el, k, ings } = cookState;
   const n = r.steps.length;
   const last = i === n - 1;
-  el.innerHTML = `<div class="cook-top"><button class="close" id="cookClose" aria-label="Выйти">×</button><div class="cook-title"><b>${esc(r.t)}</b><span>Шаг ${i + 1} из ${n}</span></div><button class="btn sm" id="cookIngs">${ings ? 'Шаги' : 'Продукты'}</button></div>
+  el.innerHTML = `<div class="cook-top"><button class="close" id="cookClose" aria-label="Выйти">×</button><div class="cook-title"><b>${esc(r.t)}</b><span>Шаг ${i + 1} из ${n}</span></div>${hook('cookToolsHTML')}<button class="btn sm" id="cookIngs">${ings ? 'Шаги' : 'Продукты'}</button></div>
     <div class="cook-bar"><span style="width:${(i + 1) / n * 100}%"></span></div>
     ${ings ? `<ul class="ings cook-ings">${r.items.map(it => `<li><span class="st basic">•</span><span class="nm"><span>${esc(ING[it.id].n)}</span></span><span class="qty">${esc(qtyText(it, k))}</span></li>`).join('')}</ul>`
-      : `<div class="cook-step">${stepImg(r.id, i) ? `<img class="cook-img" src="${esc(stepImg(r.id, i))}" alt="">` : ''}<p>${esc(r.steps[i])}</p><div class="row">${stepTimers(r.steps[i], `${r.t}, шаг ${i + 1}`)}</div>${last && r.tip ? `<div class="tip"><b>Совет.</b> ${esc(r.tip)}</div>` : ''}</div>`}
+      : `<div class="cook-step">${stepImg(r.id, i) ? `<img class="cook-img" src="${esc(stepImg(r.id, i))}" alt="">` : ''}<p>${esc(r.steps[i])}</p><div class="row">${stepTimers(r.steps[i], `${r.t}, шаг ${i + 1}`, r.id)}</div>${last && r.tip ? `<div class="tip"><b>Совет.</b> ${esc(r.tip)}</div>` : ''}</div>`}
     <div class="cook-nav"><button class="btn" data-go="-1"${i === 0 ? ' disabled' : ''}>← Назад</button>${last ? '<button class="btn primary" data-go="99">Готово!</button>' : '<button class="btn primary" data-go="1">Дальше →</button>'}</div>`;
 }
 function cookGo(d) {
   if (!cookState) return;
-  if (d === 99) { const c = ((S.notes[cookState.r.id] || {}).c || 0) + 1; setNote(cookState.r.id, { c, last: new Date().toISOString().slice(0, 10) }); closeCook(); toast('Готово! Отметил в заметках к рецепту'); return; }
+  if (d === 99) { const c = ((S.notes[cookState.r.id] || {}).c || 0) + 1; setNote(cookState.r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', cookState.r, cookState.k); closeCook(); toast('Готово! Отметил в заметках к рецепту'); return; }
   cookState.i = Math.max(0, Math.min(cookState.r.steps.length - 1, cookState.i + d));
   cookState.ings = false;
   drawCook();
+  hook('cookStepChanged');
 }
 function closeCook(fromPop) {
   if (!cookState) return;
@@ -822,9 +837,10 @@ document.addEventListener('keydown', e => {
 // ---------- Таймеры ----------
 const timers = [];
 let audioCtx = null, tickId = 0;
-function startTimer(min, label) {
+function startTimer(min, label, rid) {
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); } catch { /* без звука */ }
-  timers.push({ id: Date.now() + Math.random(), label, end: Date.now() + min * 60000, ring: false });
+  timers.push({ id: Date.now() + Math.random(), label, rid, min, end: Date.now() + min * 60000, ring: false });
+  hook('timerStarted');
   toast(`Таймер на ${min} мин запущен`);
   tick();
   if (!tickId) tickId = setInterval(tick, 1000);
@@ -845,7 +861,7 @@ function tick() {
   bar.innerHTML = timers.map(t => {
     const left = Math.max(0, Math.round((t.end - now) / 1000));
     const mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, '0');
-    return `<div class="timer${t.ring ? ' ring' : ''}" title="${esc(t.label)}"><span>${t.ring ? 'Готово! ' + esc(t.label.split(', ').pop()) : '⏱ ' + mm + ':' + ss}</span><button type="button" data-stop="${t.id}" aria-label="Остановить таймер">×</button></div>`;
+    return `<div class="timer${t.ring ? ' ring' : ''}" title="${esc(t.label)}"><span>${t.ring ? 'Готово! ' + esc(t.label.split(', ').pop()) : '⏱ ' + mm + ':' + ss}</span>${!t.ring && t.rid && !/^(my|ai)-/.test(t.rid) && window.API_BASE ? `<a class="tg-timer" href="https://t.me/kulinar_pomoshchnik_bot?start=t${Math.max(1, Math.ceil((t.end - now) / 60000))}_${esc(t.rid)}" target="_blank" rel="noopener" title="Напомнить в Telegram, даже если закрыть сайт">📲</a>` : ''}<button type="button" data-stop="${t.id}" aria-label="Остановить таймер">×</button></div>`;
   }).join('');
   if (!timers.length) { clearInterval(tickId); tickId = 0; }
 }
@@ -867,6 +883,7 @@ function renderList() {
   app.innerHTML = `<div class="page">
     <div class="results-head"><h1>Список покупок</h1>${c ? `<span class="muted small">Город: ${esc(c.n)}</span>` : ''}</div>
     ${hook('familyHTML')}
+    ${hook('listShareHTML')}
     <form class="ask-row card" id="addItem">
       <input class="input" id="itemQ" placeholder="Добавить свой пункт: хлеб, салфетки…" autocomplete="off">
       <button class="btn" type="submit">Добавить</button>
@@ -1079,6 +1096,7 @@ function table(head, rows) {
   return `<div class="tbl-wrap"><table><thead><tr>${head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 const THEMES = [['', 'как в системе'], ['light', 'светлая'], ['dark', 'тёмная'], ['warm', 'тёплая вечерняя']];
+try { if (localStorage.getItem('cook.big') === '1') document.documentElement.classList.add('big'); } catch { /* ничего */ }
 function renderHelp() {
   const H = window.HELP;
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -1101,6 +1119,7 @@ function renderHelp() {
       <section class="card"><h2>Оформление</h2>
         <div class="chips">${THEMES.map(([k, n]) => `<button type="button" class="chip${cur === k ? ' on' : ''}" data-theme-set="${k}">${n}</button>`).join('')}</div>
         <p class="small muted">Тёплая вечерняя — мягкий тёмный свет, не слепит на кухне вечером</p>
+        <label class="switch"><input type="checkbox" id="bigChk"${document.documentElement.classList.contains('big') ? ' checked' : ''}> Крупный шрифт — удобно читать с плиты</label>
       </section>
       <section class="card"><h2>О сайте</h2>
         <p>Рецептов в базе: ${RECIPES.length}. Всё, что вы вводите, хранится только на вашем устройстве. Город определяется по интернет-подключению (с VPN может ошибаться) — его всегда можно сменить вверху</p>
@@ -1109,6 +1128,7 @@ function renderHelp() {
     </div></div>`;
   const ib = $('#installBtn2'); if (ib) ib.addEventListener('click', doInstall);
   $$('[data-theme-set]').forEach(b => b.addEventListener('click', () => { setTheme(b.dataset.themeSet); renderHelp(); }));
+  $('#bigChk').addEventListener('change', e => { document.documentElement.classList.toggle('big', e.target.checked); try { localStorage.setItem('cook.big', e.target.checked ? '1' : '0'); } catch { /* ничего */ } });
 }
 function setTheme(t) {
   if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;

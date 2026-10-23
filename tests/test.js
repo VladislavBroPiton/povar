@@ -37,6 +37,7 @@ ok(bySt(st({ diets: ['gf'] })).every(r => !r.items.some(i => !i.opt && core.ING[
 ok(bySt(st({ methods: ['boil'] })).every(r => r.m.every(m => m === 'boil' || m === 'raw')), '«только варить» пропустил жарку');
 ok(bySt(st({ methods: ['steam'] })).length >= 5, 'мало блюд на пару');
 ok(bySt(st({ age: 1 })).length >= 8, 'мало блюд для малышей');
+core.seasonNow(null, new Date(2026, 8, 15)).forEach(id => core.SEASON_NOW.add(id));
 for (const c of Object.keys(core.COLLS)) ok(bySt(st({ occ: c })).length >= 2, `подборка ${c} почти пустая`);
 
 // --- разбор фраз ---
