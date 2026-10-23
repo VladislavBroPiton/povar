@@ -1223,5 +1223,41 @@ function boot() {
   initCity();
   track('open', { path: location.hash });
 }
+// ---------- Автообновление ----------
+// После публикации у сайта новая версия (её ставит GitHub при заливке). Сайт сам это замечает
+// и перезагружается в спокойный момент: не в режиме готовки и не когда человек печатает.
+const APP_VERSION = (document.querySelector('meta[name="app-version"]') || {}).content || 'dev';
+let updateReady = false;
+function calmMoment() {
+  const a = document.activeElement;
+  return !cookState && !timers.length && !(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) && !(sheet && sheet.open);
+}
+function applyUpdate() {
+  if (!updateReady) return;
+  if (document.hidden || calmMoment()) location.reload();
+}
+async function checkUpdate() {
+  if (APP_VERSION === 'dev' || updateReady || !navigator.onLine) return;
+  try {
+    const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const { v } = await r.json();
+    if (v && v !== APP_VERSION) {
+      updateReady = true;
+      if (document.hidden) return; // перезагружу, когда человек вернётся на вкладку
+      if (calmMoment()) { toast('Сайт обновился, загружаю новую версию…'); setTimeout(applyUpdate, 1200); }
+    }
+  } catch { /* нет сети — проверю позже */ }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { if (updateReady) applyUpdate(); else checkUpdate(); } });
+window.addEventListener('hashchange', () => { if (updateReady) setTimeout(applyUpdate, 300); });
+setInterval(checkUpdate, 5 * 60 * 1000);
+setTimeout(checkUpdate, 20000);
+// новый офлайн-помощник (sw.js) взял управление — значит, вышла новая версия
+if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) { updateReady = true; applyUpdate(); } });
+}
+
 // запуск откладываю до конца загрузки всех скриптов (online.js встраивает свои функции)
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else setTimeout(boot, 0);
