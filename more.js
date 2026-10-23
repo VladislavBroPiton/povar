@@ -40,7 +40,7 @@ let speakOn = false, listening = null;
 function cookToolsHTML() {
   const tts = 'speechSynthesis' in window;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  return `${tts ? `<button class="btn sm${speakOn ? ' primary' : ''}" id="cookSpeak" title="Читать шаги вслух">🔊</button>` : ''}${SR ? `<button class="btn sm${listening ? ' primary' : ''}" id="cookVoice" title="Голосовые команды: дальше, назад, повтори, таймер">🎙</button>` : ''}`;
+  return `${tts ? `<button class="btn sm${speakOn ? ' primary' : ''}" id="cookSpeak" title="Читать шаги вслух" aria-label="Читать шаги вслух">${IC.speaker}</button>` : ''}${SR ? `<button class="btn sm${listening ? ' primary' : ''}" id="cookVoice" title="Голосовые команды: дальше, назад, повтори, таймер" aria-label="Голосовые команды">${IC.mic}</button>` : ''}`;
 }
 function speakStep() {
   if (!cookState || !('speechSynthesis' in window)) return;
@@ -87,7 +87,7 @@ new MutationObserver(() => {
 
 // ---------- Список покупок картинкой ----------
 function listShareHTML() {
-  return S.list.some(x => !x.got) ? '<button class="btn sm" type="button" data-listcard>🖼 Отправить список картинкой</button>' : '';
+  return S.list.some(x => !x.got) ? `<button class="btn sm" type="button" data-listcard>${IC.image}Отправить список картинкой</button>` : '';
 }
 async function listCard() {
   const left = S.list.filter(x => !x.got);
@@ -124,10 +124,10 @@ function commentsHTML(r) {
   if (!window.API_BASE || r.own || r.ai) return '';
   setTimeout(() => loadComments(r.id), 0);
   return `<section class="card comments no-print" id="comments"><h2>Отзывы</h2><div id="cmList"><p class="muted small">Загружаю…</p></div>
-    <details><summary class="btn sm">✍️ Оставить отзыв</summary>
+    <details><summary class="btn sm">${IC.pen}Оставить отзыв</summary>
       <form id="cmForm" class="cm-form"><input class="input" name="name" maxlength="40" placeholder="Имя (необязательно)">
       <textarea class="input" name="text" rows="3" maxlength="1000" required placeholder="Как получилось? Что поменяли?"></textarea>
-      <div class="row"><label class="btn sm">📷 Фото блюда<input type="file" accept="image/*" name="photo" hidden></label><span class="small muted" id="cmPhoto"></span></div>
+      <div class="row"><label class="btn sm">${IC.camera}Фото блюда<input type="file" accept="image/*" name="photo" hidden></label><span class="small muted" id="cmPhoto"></span></div>
       <button class="btn primary" type="submit">Отправить</button>
       <p class="small muted">Отзыв появится после проверки. Ссылки не публикуем</p></form></details></section>`;
 }
@@ -169,7 +169,7 @@ async function dishPhoto(file) {
     $('#sheetBody').innerHTML = `<div class="sheet-head"><h3>${esc(d.name || 'Не узнал блюдо')}</h3><button class="close" data-close aria-label="Закрыть">×</button></div>
       ${d.about ? `<p>${esc(d.about)}</p>` : ''}
       ${recs.length ? `<h3>Похожие рецепты</h3><div class="grid">${recs.map(r => card({ r, miss: [] }, new Set())).join('')}</div>` : ''}
-      <div class="row"><button class="btn" type="button" data-act="airecipe">✨ Придумать рецепт этого блюда</button></div>`;
+      <div class="row"><button class="btn" type="button" data-act="airecipe">${IC.sparkle}Придумать рецепт этого блюда</button></div>`;
     if (d.name) S.q = d.name;
     track('ai', { q: 'dish: ' + (d.name || '?') });
   } catch (err) { $('#sheetBody').innerHTML = `<div class="sheet-head"><h3>Не получилось</h3><button class="close" data-close aria-label="Закрыть">×</button></div><p>${esc(err.message)}</p>`; }

@@ -71,7 +71,7 @@ function renderFamily() {
 // ---------- Дневник питания ----------
 const today = () => new Date().toISOString().slice(0, 10);
 function recipeButtonsHTML(r) {
-  return `<button class="btn" type="button" data-eat="${esc(r.id)}">🍴 Съел порцию</button><button class="btn" type="button" data-card="${esc(r.id)}">🖼 Картинка для соцсетей</button>`;
+  return `<button class="btn" type="button" data-eat="${esc(r.id)}">${IC.fork}Съел порцию</button><button class="btn" type="button" data-card="${esc(r.id)}">${IC.image}Картинка для соцсетей</button>`;
 }
 function eat(id) {
   const r = RBYID[id]; if (!r) return;
@@ -109,9 +109,9 @@ function renderDiary() {
     <section class="card"><h2>Сегодня</h2>
       ${bar(t[0], target[0], 'Калории', 'ккал')}${bar(t[1], target[1], 'Белки', 'г')}${bar(t[2], target[2], 'Жиры', 'г')}${bar(t[3], target[3], 'Углеводы', 'г')}
       ${advice ? `<div class="notice">${advice}</div>` : ''}
-      ${items.length ? `<ul class="shop-list">${items.map((x, i) => `<li><span>🍴</span><span class="nm"><a href="#/r/${esc(x.id)}">${esc(x.t)}</a><small>${Math.round(x.e[0] * x.p)} ккал · Б ${Math.round(x.e[1] * x.p)} · Ж ${Math.round(x.e[2] * x.p)} · У ${Math.round(x.e[3] * x.p)}</small></span>
+      ${items.length ? `<ul class="shop-list">${items.map((x, i) => `<li><span>${IC.fork}</span><span class="nm"><a href="#/r/${esc(x.id)}">${esc(x.t)}</a><small>${Math.round(x.e[0] * x.p)} ккал · Б ${Math.round(x.e[1] * x.p)} · Ж ${Math.round(x.e[2] * x.p)} · У ${Math.round(x.e[3] * x.p)}</small></span>
         <span class="row"><button class="btn sm" type="button" data-pp="${i}" data-d="0.5">½</button><button class="btn sm" type="button" data-pp="${i}" data-d="1">+1</button><button class="close" type="button" data-rm="${i}" aria-label="Удалить">×</button></span></li>`).join('')}</ul>`
-        : `<p class="muted">Пока пусто. На странице рецепта нажмите «🍴 Съел порцию»</p>`}
+        : `<p class="muted">Пока пусто. На странице рецепта нажмите «Съел порцию»</p>`}
     </section>
     <section class="card"><h2>Неделя</h2><div class="week">${days.map(([dt, k]) => `<div class="wk"><span class="wk-bar"><span style="height:${Math.round(k / maxK * 100)}%"${k > goal * 1.1 ? ' class="over"' : ''}></span></span><small>${new Date(dt).toLocaleDateString(window.LANG === 'en' ? 'en-GB' : 'ru-RU', { weekday: 'short' })}</small><b>${Math.round(k)}</b></div>`).join('')}</div>
       <p class="small muted">Цель: ${goal} ккал в день. <a href="#/family">Изменить</a>. Расчёт по средним значениям продуктов — это ориентир, не медицинский совет</p></section>
@@ -207,7 +207,7 @@ async function planCard() {
   c.fillText('Составлено на «Что приготовить» · ' + BASE.replace(/^https?:\/\//, '').replace(/\/$/, ''), W / 2, H - 50);
   await shareCanvas(cv, 'menu.jpg', 'Наше меню на неделю');
 }
-function planShareHTML() { return S.plan && S.plan.days ? '<button class="btn" type="button" data-plancard>🖼 Поделиться меню картинкой</button>' : ''; }
+function planShareHTML() { return S.plan && S.plan.days ? `<button class="btn" type="button" data-plancard>${IC.image}Поделиться меню картинкой</button>` : ''; }
 
 // ---------- Фото к шагам (если есть для рецепта) ----------
 function stepMediaHTML(r) {

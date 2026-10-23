@@ -201,6 +201,27 @@ function linksHTML(list) {
 const POPULAR = ['egg', 'g:chicken', 'potato', 'onion', 'carrot', 'pasta', 'rice', 'buckwheat', 'g:mince', 'g:cheese', 'milk', 'tomato', 'cabbage', 'cottage', 'flour', 'g:fish'];
 const LEFTOVERS = ['rice_cooked', 'buckwheat_cooked', 'pasta_cooked', 'potato_boiled', 'chicken_cooked', 'beef_cooked', 'bread_stale'];
 // Иконки подборок: свои рисунки в фирменном цвете, с лёгкой анимацией у подборки «сейчас» и при наведении
+// Значки кнопок: линии цвета текста — одинаково выглядят на всех телефонах и в тёмной теме (эмодзи рисуются по-разному)
+const ic = body => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+const IC = {
+  timer: ic('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/>'),
+  heart: ic('<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/>'),
+  heartOn: ic('<path class="fill" d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/>'),
+  camera: ic('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
+  sparkle: ic('<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>'),
+  chat: ic('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/>'),
+  fork: ic('<path d="M7 3v8a2 2 0 0 0 4 0V3M9 11v10M16 3c-2 2-2 6 0 8v10"/>'),
+  image: ic('<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 8"/>'),
+  calendar: ic('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'),
+  phone: ic('<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>'),
+  family: ic('<circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="7" r="2.5"/><circle cx="12" cy="13" r="2"/><path d="M4 20v-3a4 4 0 0 1 4-4M20 20v-3a4 4 0 0 0-4-4M9 21v-1a3 3 0 0 1 6 0v1"/>'),
+  notebook: ic('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12 8h4M12 12h4"/>'),
+  speaker: ic('<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>'),
+  mic: ic('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+  pen: ic('<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>'),
+  list: ic('<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>'),
+  grid: ic('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+};
 const ci = (cls, body) => `<svg class="ci ${cls}" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
 const COLL_ICON = {
   season: ci('ci-sway', '<path d="M12 21c-4-3-6-6-6-10a6 6 0 0 1 12 0c0 4-2 7-6 10Z"/><path d="M12 21V9M12 13l3-3"/>'),
@@ -223,6 +244,15 @@ const EMPTY_SVG = {
 };
 
 // ---------- Экран «Подбор» ----------
+// подсказка по времени суток над заголовком: утром завтрак, днём обед, вечером ужин, ночью — на завтра
+function dayPartHTML(now = new Date()) {
+  const h = now.getHours();
+  const [hi, q, label] = h >= 5 && h < 11 ? ['Доброе утро!', 'быстрый завтрак', 'Завтрак за 20 минут']
+    : h >= 11 && h < 16 ? ['Добрый день!', 'обед за 30 минут', 'Обед за 30 минут']
+      : h >= 16 && h < 22 ? ['Добрый вечер!', 'ужин за 30 минут', 'Ужин за 30 минут']
+        : ['Поздно для готовки?', 'впрок на завтра', 'Приготовить на завтра'];
+  return `<p class="daypart"><span>${hi}</span><button type="button" data-ex="${q}">${label}<span aria-hidden="true"> →</span></button></p>`;
+}
 const EXAMPLES = ['ужин из курицы в духовке на 4', 'есть яйца, молоко и мука', 'высокобелковый завтрак', 'суп без мяса', 'на пару для ребёнка 1 год', 'кашерный ужин на 10 гостей', 'грузинская кухня', 'что сделать из вчерашнего риса'];
 let titleWords = [], lastNotice = '', shown = 24;
 function renderFind() {
@@ -234,6 +264,7 @@ function renderFind() {
   app.innerHTML = `<div class="page find">
     <section class="hero" aria-label="Что приготовить">
       <div class="hero-text">
+        ${dayPartHTML()}
         <h1>Что приготовить?</h1>
         <p class="lead">Напишите или скажите, что есть дома и чего хочется. Подберу рецепт под ваш город, цель и число гостей</p>
         <form class="ask-row" id="askForm">
@@ -254,7 +285,7 @@ function renderFind() {
         <div class="ac"><input class="input" data-ac="have" placeholder="Добавить продукт: яйца, фарш…" autocomplete="off"><div class="ac-list" hidden></div></div>
         <div class="chips" data-tags="have">${tagsHTML('have')}</div>
         ${hook('onlinePhotoHTML')}
-        <button class="btn sm" type="button" id="datesBtn"${S.have.length ? '' : ' hidden'}>📅 Сроки и количество</button>
+        <button class="btn sm" type="button" id="datesBtn"${S.have.length ? '' : ' hidden'}>${IC.calendar}Сроки и количество</button>
         <div id="datesBox" hidden></div>
         <p class="small muted">Быстро добавить:</p>
         <div class="chips">${POPULAR.filter(t => !S.have.includes(t)).map(t => `<button type="button" class="chip" data-add-have="${t}">+ ${esc(tokenName(t))}</button>`).join('')}</div>
@@ -376,7 +407,7 @@ function updateResults(more) {
   const any = S.have.length || S.want.length || S.ex.length || S.meal.length || S.kind.length || S.goals.length || S.methods.length || S.diets.length || S.cuisine.length || S.occ || S.age || S.time || S.lvl || titleWords.length;
   let h = `<div class="results-head"><h2>${rows.length ? `Нашёл ${rows.length} ${plural(rows.length, 'рецепт', 'рецепта', 'рецептов')}` : 'Ничего не нашлось'}</h2>
     <div class="row">
-      <div class="seg" role="group" aria-label="Вид"><button type="button" data-view="grid" class="${S.view === 'grid' ? 'on' : ''}" aria-label="Плиткой">▦</button><button type="button" data-view="list" class="${S.view === 'list' ? 'on' : ''}" aria-label="Списком">☰</button></div>
+      <div class="seg" role="group" aria-label="Вид"><button type="button" data-view="grid" class="${S.view === 'grid' ? 'on' : ''}" aria-label="Плиткой">${IC.grid}</button><button type="button" data-view="list" class="${S.view === 'list' ? 'on' : ''}" aria-label="Списком">${IC.list}</button></div>
       <label class="sort">Сначала <select id="sortSel">
       ${[['match', 'подходящие'], ['time', 'быстрые'], ['kcal', 'меньше калорий'], ['protein', 'больше белка'], ['cheap', 'дешевле'], ['rated', 'мои оценки']].map(([v, n]) => `<option value="${v}"${S.sort === v ? ' selected' : ''}>${n}</option>`).join('')}
       </select></label></div></div>`;
@@ -575,7 +606,7 @@ function dietBlocks(d, id, r) {
 }
 function stepTimers(s, label, rid) {
   return [...s.matchAll(/(?<![\d,.])(\d+(?:[.,]\d+)?)(?:\s*[-–]\s*\d+(?:[.,]\d+)?)?\s*(мин|час)/g)].slice(0, 2)
-    .map(m => { const min = Math.round(parseFloat(m[1].replace(',', '.')) * (m[2] === 'мин' ? 1 : 60)); return min > 0 && min <= 600 ? `<button class="btn sm" type="button" data-timer="${min}" data-label="${esc(label)}" data-rid="${esc(rid || '')}">⏱ ${min >= 60 ? (min % 60 ? Math.floor(min / 60) + ' ч ' + (min % 60) + ' мин' : min / 60 + ' ч') : min + ' мин'}</button>` : ''; }).join('');
+    .map(m => { const min = Math.round(parseFloat(m[1].replace(',', '.')) * (m[2] === 'мин' ? 1 : 60)); return min > 0 && min <= 600 ? `<button class="btn sm" type="button" data-timer="${min}" data-label="${esc(label)}" data-rid="${esc(rid || '')}">${IC.timer}${min >= 60 ? (min % 60 ? Math.floor(min / 60) + ' ч ' + (min % 60) + ' мин' : min / 60 + ' ч') : min + ' мин'}</button>` : ''; }).join('');
 }
 function drawRecipe(r) {
   const k = curServ / r.serv * panK;
@@ -639,7 +670,7 @@ function drawRecipe(r) {
         ${hook('profileFitHTML', r)}
         <div class="row no-print">
           <button class="btn primary" type="button" id="cookBtn">▶ Готовить пошагово</button>
-          <button class="btn${fav ? ' on-fav' : ''}" type="button" id="favBtn">${fav ? '♥ В избранном' : '♡ В избранное'}</button>
+          <button class="btn${fav ? ' on-fav' : ''}" type="button" id="favBtn">${fav ? IC.heartOn + 'В избранном' : IC.heart + 'В избранное'}</button>
           <button class="btn" type="button" id="shareBtn">Поделиться</button>
           <button class="btn" type="button" id="printBtn">Распечатать</button>
           ${r.own ? `<a class="btn" href="#/my/edit/${esc(r.id)}">Изменить</a>` : ''}
@@ -652,6 +683,7 @@ function drawRecipe(r) {
       <section class="card">
         <div class="row" style="justify-content:space-between"><h2>Продукты</h2>
           <div class="stepper" aria-label="Порций"><button type="button" data-rs="-1" aria-label="Меньше порций">−</button><output>${curServ}</output><button type="button" data-rs="1" aria-label="Больше порций">+</button></div></div>
+        <input class="serv-range" type="range" min="1" max="20" step="1" value="${Math.min(curServ, 20)}" data-rsr aria-label="Сколько порций">
         <p class="small muted">${curServ} ${plural(curServ, 'порция', 'порции', 'порций')}${curServ !== r.serv ? ` (в оригинале ${r.serv}), количество пересчитано` : ''}${priceOn() && r.cost ? ` · всё блюдо ≈ ${fmtRub(r.cost * coef() * curServ * panK)}` : ''}</p>
         ${panHTML(r)}
         <ul class="ings">${ingRows}</ul>
@@ -663,7 +695,7 @@ function drawRecipe(r) {
       </section>
       <section class="card">
         <h2>Как готовить</h2>
-        <p class="small muted no-print">Нажмите на шаг, чтобы отметить его сделанным. Кнопка ⏱ запускает таймер</p>
+        <p class="small muted no-print">Нажмите на шаг, чтобы отметить его сделанным. Кнопка ${IC.timer} запускает таймер</p>
         <ol class="steps">${steps}</ol>
         ${r.tip ? `<div class="tip"><b>Совет.</b> ${esc(r.tip)}</div>` : ''}
         ${drinksHTML(r)}
@@ -725,6 +757,9 @@ function addItemsToList(items, title) {
 }
 function bindRecipe(r) {
   const root = $('.recipe');
+  // ползунок: пока тянут — меняю только число, отпустили — пересчитываю продукты
+  root.addEventListener('input', e => { if (e.target.matches('[data-rsr]')) { const o = $('.r-cols .stepper output'); if (o) o.textContent = e.target.value; } });
+  root.addEventListener('change', e => { if (e.target.matches('[data-rsr]')) { curServ = +e.target.value; drawRecipe(r); loadGallery(r); } });
   root.addEventListener('click', async e => {
     const b = e.target.closest('button, [data-back], li[data-step]');
     if (!b) return;
@@ -738,7 +773,7 @@ function bindRecipe(r) {
     if (b.matches('li[data-step]')) { b.classList.toggle('done'); return; }
     if (b.id === 'cookBtn') { openCook(r); return; }
     if (b.id === 'cookedBtn') { const c = ((S.notes[r.id] || {}).c || 0) + 1; setNote(r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', r, curServ / r.serv * panK); b.textContent = `Я приготовил · ${c} ${plural(c, 'раз', 'раза', 'раз')}`; toast('Отметил. Приятного аппетита!'); return; }
-    if (b.id === 'favBtn') { S.fav = S.fav.includes(r.id) ? S.fav.filter(x => x !== r.id) : [...S.fav, r.id]; save(); const on = S.fav.includes(r.id); b.classList.toggle('on-fav', on); b.textContent = on ? '♥ В избранном' : '♡ В избранное'; if (on) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300 }); return; }
+    if (b.id === 'favBtn') { S.fav = S.fav.includes(r.id) ? S.fav.filter(x => x !== r.id) : [...S.fav, r.id]; save(); const on = S.fav.includes(r.id); b.classList.toggle('on-fav', on); b.innerHTML = on ? IC.heartOn + 'В избранном' : IC.heart + 'В избранное'; if (on) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300 }); return; }
     if (b.id === 'printBtn') { print(); return; }
     if (b.id === 'shareBtn') {
       const url = r.own ? location.href : BASE + 'r/' + r.id + '.html';
@@ -868,7 +903,7 @@ function tick() {
   bar.innerHTML = timers.map(t => {
     const left = Math.max(0, Math.round((t.end - now) / 1000));
     const mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, '0');
-    return `<div class="timer${t.ring ? ' ring' : ''}" title="${esc(t.label)}"><span>${t.ring ? 'Готово! ' + esc(t.label.split(', ').pop()) : '⏱ ' + mm + ':' + ss}</span>${!t.ring && t.rid && !/^(my|ai)-/.test(t.rid) && window.API_BASE ? `<a class="tg-timer" href="https://t.me/kulinar_pomoshchnik_bot?start=t${Math.max(1, Math.ceil((t.end - now) / 60000))}_${esc(t.rid)}" target="_blank" rel="noopener" title="Напомнить в Telegram, даже если закрыть сайт">📲</a>` : ''}<button type="button" data-stop="${t.id}" aria-label="Остановить таймер">×</button></div>`;
+    return `<div class="timer${t.ring ? ' ring' : ''}" title="${esc(t.label)}"><span>${t.ring ? 'Готово! ' + esc(t.label.split(', ').pop()) : IC.timer + mm + ':' + ss}</span>${!t.ring && t.rid && !/^(my|ai)-/.test(t.rid) && window.API_BASE ? `<a class="tg-timer" href="https://t.me/kulinar_pomoshchnik_bot?start=t${Math.max(1, Math.ceil((t.end - now) / 60000))}_${esc(t.rid)}" target="_blank" rel="noopener" title="Напомнить в Telegram, даже если закрыть сайт" aria-label="Напомнить в Telegram">${IC.phone}</a>` : ''}<button type="button" data-stop="${t.id}" aria-label="Остановить таймер">×</button></div>`;
   }).join('');
   if (!timers.length) { clearInterval(tickId); tickId = 0; }
 }
@@ -1004,7 +1039,7 @@ function renderFav() {
   const cooked = Object.entries(S.notes).filter(([id, n]) => n.c && RBYID[id]).sort((a, b) => (b[1].last || '').localeCompare(a[1].last || '')).slice(0, 8).map(([id]) => ({ r: RBYID[id], miss: [] }));
   app.innerHTML = `<div class="page">
     <h1>Избранное</h1>
-    <div class="row"><a class="btn" href="#/family">👨‍👩‍👧 Наша семья</a><a class="btn" href="#/diary">📒 Дневник питания</a></div>
+    <div class="row"><a class="btn" href="#/family">${IC.family}Наша семья</a><a class="btn" href="#/diary">${IC.notebook}Дневник питания</a></div>
     ${rows.length ? `<div class="grid">${rows.map(x => card(x, H)).join('')}</div>` : `<div class="empty">${EMPTY_SVG.heart}<p>Здесь будут рецепты, которые вы отметили ♡</p><a class="btn primary" href="#/">Подобрать рецепт</a></div>`}
     <div class="results-head"><h2>Мои рецепты</h2><a class="btn primary" href="#/my/new">+ Добавить свой рецепт</a></div>
     ${mine.length ? `<div class="grid">${mine.map(x => card(x, new Set())).join('')}</div>` : '<p class="muted">Добавьте бабушкин рецепт: сайт сам посчитает БЖУ, цену и пересчитает на любое число порций</p>'}
@@ -1043,7 +1078,7 @@ function renderMyEdit(id) {
       <div><h3>Продукты</h3><p class="small muted">Выбирайте из подсказок, тогда посчитаю БЖУ и цену</p><div id="ingRows"></div><button class="btn sm" type="button" id="addIng">+ Продукт</button></div>
       <label>Шаги — каждый с новой строки<textarea class="input" name="steps" rows="7" placeholder="Обжарьте лук до золотистого цвета, 5 минут">${esc(r.steps.join('\n'))}</textarea></label>
       <label>Совет<input class="input" name="tip" value="${esc(r.tip || '')}"></label>
-      <div class="row"><label class="btn sm">📷 Фото<input type="file" accept="image/*" id="myPhoto" hidden></label><span class="small muted" id="photoState">${img ? 'фото есть' : 'без фото'}</span></div>
+      <div class="row"><label class="btn sm">${IC.camera}Фото<input type="file" accept="image/*" id="myPhoto" hidden></label><span class="small muted" id="photoState">${img ? 'фото есть' : 'без фото'}</span></div>
       <div class="row"><button class="btn primary" type="submit">Сохранить</button>${r0 ? '<button class="btn ghost" type="button" id="delMy">Удалить рецепт</button>' : ''}<a class="btn ghost" href="#/fav">Отмена</a></div>
     </form></div>`;
   if (!rows.length) rows = [{ id: '', a: '', u: 'г' }, { id: '', a: '', u: 'г' }, { id: '', a: '', u: 'г' }];
@@ -1213,6 +1248,8 @@ function route() {
   $$('.tabs a').forEach(a => a.classList.remove('on'));
   const tab = n => { const a = $(`.tabs [data-tab="${n}"]`); if (a) a.classList.add('on'); };
   document.title = HOME_TITLE;
+  // вопрос про город — только на главной: на других страницах он закрывал бы рецепт
+  const cc = $('#cityConfirm'); if (cc) cc.classList.toggle('away', !/^#\/?(\?.*)?$/.test(h));
   syncTgBack();
   const go = (view, t, fn) => { curView = view; tab(t); fn(); scrollTo(0, 0); };
   const extra = hook('onlineRoute', h) || hook('extraRoute', h);

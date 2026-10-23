@@ -42,15 +42,15 @@ const nl2br = s => esc(s).replace(/\n/g, '<br>');
 // ---------- Места в интерфейсе ----------
 function onlineHeroHTML() {
   if (!API) return '';
-  return `<div class="row ai-row"><button class="btn" type="button" data-act="ask">💬 Спросить повара</button><button class="btn" type="button" data-act="airecipe">✨ Придумать рецепт из моих продуктов</button><label class="btn">📸 Что это за блюдо?<input type="file" accept="image/*" data-act="dish" hidden></label></div>`;
+  return `<div class="row ai-row"><button class="btn" type="button" data-act="ask">${IC.chat}Спросить повара</button><button class="btn" type="button" data-act="airecipe">${IC.sparkle}Придумать рецепт из моих продуктов</button><label class="btn">${IC.camera}Что это за блюдо?<input type="file" accept="image/*" data-act="dish" hidden></label></div>`;
 }
 function onlinePhotoHTML() {
   if (!API) return '';
-  return `<label class="btn sm photo-btn">📷 Фото холодильника — найду продукты сам<input type="file" accept="image/*" capture="environment" data-act="fridge" hidden></label>`;
+  return `<label class="btn sm photo-btn">${IC.camera}Фото холодильника — найду продукты сам<input type="file" accept="image/*" capture="environment" data-act="fridge" hidden></label>`;
 }
 function onlineNotFoundHTML() {
   if (!API) return '';
-  return `<div class="row"><button class="btn primary" type="button" data-act="airecipe">✨ Придумать рецепт под мой запрос</button><button class="btn" type="button" data-act="ask">💬 Спросить повара</button></div>`;
+  return `<div class="row"><button class="btn primary" type="button" data-act="airecipe">${IC.sparkle}Придумать рецепт под мой запрос</button><button class="btn" type="button" data-act="ask">${IC.chat}Спросить повара</button></div>`;
 }
 function recipeExtraHTML(r) {
   if (!r.ai) return '';
