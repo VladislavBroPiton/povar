@@ -28,6 +28,7 @@ for (const [sname, w, h] of SIZES) {
   for (const [pname, path, sel] of PAGES) {
     errs = [];
     const where = `${pname} (${sname} ${w}×${h})`;
+    const t0 = Date.now();
     try {
       await page.goto(BASE + path, { waitUntil: 'load', timeout: 30000 });
       await page.waitForSelector(sel, { timeout: 10000 });
@@ -38,6 +39,7 @@ for (const [sname, w, h] of SIZES) {
       fails.push(`${where}: не отрисовалась — ${e.message.split('\n')[0]}`);
     }
     for (const x of errs) fails.push(`${where}: ${x}`);
+    console.log(`${where}: ${Date.now() - t0} мс`);
   }
   await ctx.close();
 }

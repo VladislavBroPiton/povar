@@ -30,6 +30,7 @@ jobs:
           sed -i -E "s/<meta name=\"app-version\" content=\"[^\"]*\">/<meta name=\"app-version\" content=\"$VER\">/" index.html
           printf '{"v":"%s"}\n' "$VER" > version.json
       - name: Проверка в браузере (телефон, планшет, компьютер)
+        timeout-minutes: 8
         run: |
           npm i --no-save --no-package-lock playwright@1.48.2
           npx playwright install --with-deps chromium
