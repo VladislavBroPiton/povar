@@ -1,8 +1,8 @@
 // Офлайн-режим: оболочка и рецепты сохраняются при первом заходе, фото — по мере просмотра
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL = [
-  './', 'index.html', 'app.css?v=3', 'config.js?v=3', 'core.js?v=3', 'ui.js?v=3', 'online.js?v=3', 'manifest.webmanifest',
-  'data/ingredients.js?v=3', 'data/cities.js?v=3', 'data/recipes.js?v=3', 'data/help.js?v=3',
+  './', 'index.html', 'app.css?v=4', 'config.js?v=4', 'core.js?v=4', 'ui.js?v=4', 'online.js?v=4', 'manifest.webmanifest',
+  'data/ingredients.js?v=4', 'data/cities.js?v=4', 'data/recipes.js?v=4', 'data/help.js?v=4',
   'icons/icon-192.png', 'icons/icon-512.png'
 ];
 
@@ -19,6 +19,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+  // видео грузится кусками (ответ 206) — его не кэширую
+  if (url.pathname.includes('/media/')) return;
   // фото: из кэша, если есть
   if (url.pathname.includes('/img/')) {
     e.respondWith(caches.open('img-' + VERSION).then(async c => {

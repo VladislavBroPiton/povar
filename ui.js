@@ -221,7 +221,7 @@ function renderFind() {
         <div class="hint-examples">${EXAMPLES.map(e => `<button type="button" data-ex="${esc(e)}">${esc(e)}</button>`).join('')}</div>
         ${hook('onlineHeroHTML')}
       </div>
-      ${EMPTY_SVG.pot.replace('class="ill"', 'class="ill hero-ill"')}
+      <div class="hero-media" id="heroMedia" aria-hidden="true"><img src="media/hero-${heroFormat()}.jpg" alt="" width="960" height="540"></div>
     </section>
     <section class="colls" aria-label="Подборки">
       ${collOrder.map(k => `<button type="button" class="coll${S.occ === k ? ' on' : ''}${now.includes(k) ? ' now' : ''}" data-coll="${k}"><span aria-hidden="true">${COLL_ICON[k]}</span>${esc(COLLS[k].n)}${now.includes(k) ? '<small>сейчас</small>' : ''}</button>`).join('')}
@@ -273,6 +273,28 @@ function renderFind() {
   </div>`;
   bindFind();
   updateResults();
+  heroVideo();
+}
+// Ролик на первом экране: широкий для компьютера и телефона боком, пониже — для телефона
+const heroFormat = () => matchMedia('(max-width: 640px) and (orientation: portrait)').matches ? '4x3' : '16x9';
+let heroObs = null;
+function heroVideo() {
+  const box = $('#heroMedia'); if (!box) return;
+  const conn = navigator.connection || {};
+  // без ролика: экономия трафика, медленная сеть, просьба не анимировать — остаётся фото
+  if (conn.saveData || /(^|-)2g|3g/.test(conn.effectiveType || '') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const f = heroFormat();
+  const v = document.createElement('video');
+  Object.assign(v, { muted: true, loop: true, playsInline: true, autoplay: true, preload: 'auto', poster: `media/hero-${f}.jpg` });
+  v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+  v.innerHTML = `<source src="media/hero-${f}.webm" type="video/webm"><source src="media/hero-${f}.mp4" type="video/mp4">`;
+  v.addEventListener('playing', () => box.classList.add('live'), { once: true });
+  box.appendChild(v);
+  const p = v.play(); if (p) p.catch(() => v.remove());
+  // ролик вне экрана — на паузу, чтобы не тратить батарею
+  if (heroObs) heroObs.disconnect();
+  heroObs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }));
+  heroObs.observe(box);
 }
 function summaries() {
   const set = (k, v) => { const el = $(`[data-sum="${k}"]`); if (el) el.textContent = v; };
