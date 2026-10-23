@@ -435,6 +435,74 @@ function planTotals(plan, city) {
   return { need, cost, perDay: per.map(v => v / n) };
 }
 
+// ---------- Аллергены (по обязательным продуктам) ----------
+const ALLERGENS = [
+  ['nuts', '🥜', 'Орехи', i => i.cat === 'nut' && !['sesame', 'coconut_milk'].includes(i.id)],
+  ['milk', '🥛', 'Молоко', i => i.cat === 'dairy'],
+  ['egg', '🥚', 'Яйца', i => i.cat === 'egg' || i.id === 'mayonnaise'],
+  ['gluten', '🌾', 'Глютен', i => i.fl.includes('g')],
+  ['fish', '🐟', 'Рыба', i => i.cat === 'fish'],
+  ['shell', '🦐', 'Морепродукты', i => i.cat === 'seafood'],
+  ['sesame', '⚪', 'Кунжут', i => ['sesame', 'tahini', 'sesame_oil'].includes(i.id)],
+  ['honey', '🍯', 'Мёд', i => i.fl.includes('h')]
+];
+function allergens(r) {
+  const req = r.items.filter(i => !i.opt).map(i => ING[i.id]);
+  return ALLERGENS.filter(([, , , test]) => req.some(test)).map(([k, ic, n]) => ({ k, ic, n }));
+}
+
+// ---------- Что выпить к блюду ----------
+// opts.noAlcohol — человек выбрал халяль, детское, или это блюдо к Рамадану: вино не предлагаю
+function drinks(r, opts = {}) {
+  const ids = new Set(r.items.filter(i => !i.opt).map(i => i.id));
+  const cats = new Set(r.items.filter(i => !i.opt).map(i => ING[i.id].cat));
+  const soft = [], wine = [];
+  if (r.kind === 'dessert' || r.kind === 'bake' || r.goal.sweet) { soft.push('чёрный чай', 'какао', 'молоко'); wine.push('десертное вино или игристое полусладкое'); }
+  else if (r.kind === 'breakfast') soft.push('кофе', 'чай', 'свежевыжатый сок');
+  else {
+    if (r.cuisine === 'cauc') { soft.push('тархун', 'айран', 'гранатовый сок'); wine.push('грузинское красное (саперави)'); }
+    else if (r.cuisine === 'asia_c' || r.cuisine === 'tatar') soft.push('зелёный чай', 'айран', 'компот из сухофруктов');
+    else if (r.cuisine === 'asia') { soft.push('зелёный чай', 'лимонад с имбирём'); wine.push('рислинг'); }
+    else if (r.cuisine === 'ital') { soft.push('лимонад', 'минеральная вода с лимоном'); wine.push('итальянское красное (кьянти)'); }
+    else soft.push('морс', 'компот', 'квас');
+    if (cats.has('fish') || cats.has('seafood')) wine.push('сухое белое вино');
+    else if (cats.has('beef') || cats.has('lamb') || cats.has('pork')) wine.push('сухое красное вино');
+    else if (cats.has('poultry')) wine.push('белое или лёгкое красное вино');
+    if (r.kind === 'soup' && !soft.includes('морс')) soft.unshift('морс');
+    if (ids.has('pickles') || ids.has('herring')) soft.push('квас');
+  }
+  const noAlc = opts.noAlcohol || r.age === 1 || (r.occ || []).includes('ramadan') || r.cuisine === 'asia_c' || r.cuisine === 'tatar';
+  return { soft: [...new Set(soft)].slice(0, 3), wine: noAlc ? [] : [...new Set(wine)].slice(0, 2) };
+}
+
+// ---------- Похожие рецепты ----------
+function similar(r, n = 4) {
+  const main = new Set(r.items.filter(i => !i.opt && !isStaple(i.id) && !['spice', 'oil', 'sauce'].includes(ING[i.id].cat)).map(i => i.id));
+  return RECIPES.filter(x => x.id !== r.id && !x.own).map(x => {
+    let s = 0;
+    for (const i of x.items) if (!i.opt && main.has(i.id)) s += 2;
+    if (x.kind === r.kind) s += 2;
+    if (x.cuisine === r.cuisine) s += 1;
+    if (x.meal.some(m => r.meal.includes(m))) s += 1;
+    return { x, s };
+  }).filter(o => o.s >= 4).sort((a, b) => b.s - a.s || a.x.time - b.x.time).slice(0, n).map(o => o.x);
+}
+
+// ---------- «Купите ещё один продукт» ----------
+// какой один недостающий продукт откроет больше всего блюд при текущих фильтрах
+function oneMore(st) {
+  const H = haveSet(st);
+  if (!H.size) return null;
+  const count = {};
+  for (const r of RECIPES) {
+    if (r.own || !passes(st, r)) continue;
+    const miss = r.items.filter(i => !i.opt && itemStatus(i.id, H).s === 'miss');
+    if (miss.length === 1) count[miss[0].id] = (count[miss[0].id] || 0) + 1;
+  }
+  const best = Object.entries(count).sort((a, b) => b[1] - a[1])[0];
+  return best && best[1] >= 2 ? { id: best[0], n: best[1] } : null;
+}
+
 // ---------- Форматирование ----------
 const fmtN = v => v >= 10 ? String(Math.round(v)) : String(Math.round(v * 10) / 10).replace('.', ',');
 const FRAC = [[0.25, '¼'], [0.33, '⅓'], [0.5, '½'], [0.67, '⅔'], [0.75, '¾']];
@@ -465,5 +533,5 @@ function qtyText(it, k) {
 function plural(n, a, b, c) { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; }
 
 if (typeof module !== 'undefined') {
-  module.exports = { ING, GROUPS, COLLS, CUISINES, buildRecipes, get RECIPES() { return RECIPES; }, get RBYID() { return RBYID; }, parsePhrase, compute, passes, makePlan, planTotals, replaceInPlan, easterDate, currentOccasions, expiring, qtyText, fmtGrams, fmtQty, deptOf, regionCoef, localCuisine, acSearch, plural };
+  module.exports = { allergens, drinks, similar, oneMore, ING, GROUPS, COLLS, CUISINES, buildRecipes, get RECIPES() { return RECIPES; }, get RBYID() { return RBYID; }, parsePhrase, compute, passes, makePlan, planTotals, replaceInPlan, easterDate, currentOccasions, expiring, qtyText, fmtGrams, fmtQty, deptOf, regionCoef, localCuisine, acSearch, plural };
 }

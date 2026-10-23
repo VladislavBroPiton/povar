@@ -90,6 +90,8 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 }
 .city-btn svg { width: 18px; height: 18px; color: var(--accent); }
 .city-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-s); }
+.lang-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 10px; font-size: var(--fs-xs); font-weight: 700; cursor: pointer; color: var(--muted); }
+.lang-btn:hover { color: var(--accent); border-color: var(--accent); }
 .install-btn { border: 0; background: var(--accent); color: var(--accent-text); border-radius: 999px; padding: 7px 14px; font-weight: 600; cursor: pointer; font-size: var(--fs-s); }
 
 .city-confirm {
@@ -419,6 +421,59 @@ h3.dept { font-size: var(--fs-s); color: var(--muted); margin-top: 8px; }
 .ai-note { display: grid; gap: 8px; }
 .family { display: grid; gap: 8px; }
 
+/* Иконки подборок */
+.ci { width: 22px; height: 22px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.coll.on .ci { stroke: currentColor; }
+.ci .spark { fill: var(--accent); stroke: none; }
+.coll.on .ci .spark { fill: currentColor; }
+@media (prefers-reduced-motion: no-preference) {
+  .coll.now .ci, .coll:hover .ci { animation-duration: 2.4s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; transform-origin: 50% 60%; }
+  .coll.now .ci-twinkle .spark, .coll:hover .ci-twinkle .spark { animation: twinkle 1.6s infinite; }
+  .coll.now .ci-steam .st, .coll:hover .ci-steam .st { animation: steam 2.2s infinite; }
+  .coll.now .ci-wobble, .coll:hover .ci-wobble { animation-name: wobble; }
+  .coll.now .ci-sway, .coll:hover .ci-sway { animation-name: sway; }
+  .coll.now .ci-glow .spark, .coll:hover .ci-glow .spark { animation: twinkle 2s infinite; }
+  .coll.now .ci-tilt, .coll:hover .ci-tilt { animation-name: sway; }
+  .coll.now .ci-float, .coll:hover .ci-float { animation-name: float; }
+  .coll.now .ci-bounce, .coll:hover .ci-bounce { animation-name: float; }
+  .coll.now .ci-spin, .coll:hover .ci-spin { animation: spin 3s linear infinite; }
+}
+@keyframes twinkle { 50% { opacity: .2; transform: scale(.6); } }
+@keyframes wobble { 25% { transform: rotate(-9deg); } 75% { transform: rotate(9deg); } }
+@keyframes sway { 50% { transform: rotate(-12deg); } }
+@keyframes float { 50% { transform: translateY(-3px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Аллергены, напитки, похожие, профиль */
+.alg { display: flex; gap: 2px; font-size: 13px; }
+.alg-full { font-size: var(--fs-s); }
+.drinks { padding: 12px 14px; border-radius: var(--r-sm); background: var(--surface-2); font-size: var(--fs-s); }
+.similar { display: grid; gap: var(--gap); }
+.fits { display: flex; flex-wrap: wrap; gap: 6px; }
+.fit { font-size: var(--fs-xs); padding: 3px 10px; border-radius: 999px; background: var(--surface-2); }
+.fit.ok { background: var(--ok-soft); color: var(--ok); }
+.fit.no { background: var(--warn-soft); color: var(--warn); }
+.fit.warn { background: var(--surface-2); color: var(--muted); }
+.one-more { display: grid; gap: 8px; }
+.fam .row .input:first-child { flex: 1; min-width: 140px; }
+.fam .row select { max-width: 160px; }
+/* Дневник */
+.bar { display: grid; gap: 4px; }
+.bar-top { display: flex; justify-content: space-between; font-size: var(--fs-s); }
+.bar-track { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.bar-track span { display: block; height: 100%; background: var(--ok); border-radius: 999px; transition: width .4s; }
+.bar-track span.over, .wk-bar span.over { background: var(--accent); }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; }
+.wk { display: grid; gap: 4px; justify-items: center; font-size: var(--fs-xs); }
+.wk-bar { height: 120px; width: 100%; max-width: 36px; background: var(--surface-2); border-radius: 8px; display: flex; align-items: flex-end; overflow: hidden; }
+.wk-bar span { display: block; width: 100%; background: var(--ok); }
+.wk small { color: var(--muted); }
+/* Фото к шагам */
+.step-media { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; }
+.step-media figure { margin: 0; flex: 0 0 200px; scroll-snap-align: start; }
+.step-media img, .step-media video { width: 200px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-sm); background: var(--surface-2); display: block; }
+.step-media figcaption { font-size: var(--fs-xs); color: var(--muted); margin-top: 4px; }
+
 /* Планшет и компьютер */
 @media (min-width: 720px) {
   .page { padding: 24px; }
@@ -458,7 +513,32 @@ h3.dept { font-size: var(--fs-s); color: var(--muted); margin-top: 8px; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+/* Печать рецепта: один лист А4, как страница из кулинарной книги */
+@page { size: A4; margin: 14mm 14mm 16mm; }
 @media print {
-  .top, .tabs, .timer-bar, .no-print { display: none !important; }
-  body { padding: 0; background: #fff; color: #000; }
+  .top, .tabs, .timer-bar, .no-print, .city-confirm, .similar, .gallery, .links, .mynote, .seg, .stepper, .buy, .r-photo .credit, .step-media, .fits, #toast,
+  .recipe h3:has(+ .gallery) { display: none !important; }
+  :root { --bg: #fff; --surface: #fff; --surface-2: #f4efe8; --line: #d9cfc2; --text: #1b1612; --muted: #5b5148; --accent: #9a4426; }
+  body { padding: 0 !important; background: #fff; color: #1b1612; font-size: 10.5pt; line-height: 1.4; }
+  .page { padding: 0; gap: 10px; max-width: none; }
+  .r-hero { grid-template-columns: 62mm 1fr !important; gap: 8mm; align-items: start; }
+  .r-photo { aspect-ratio: 4 / 3; border-radius: 4mm; }
+  .r-head h1 { font-size: 22pt; }
+  .r-head .lead { font-size: 10.5pt; }
+  .facts { gap: 4px; }
+  .fact { font-size: 8.5pt; padding: 2px 8px; }
+  .r-cols { grid-template-columns: 62mm 1fr !important; gap: 8mm; }
+  .r-cols > .card:first-child { position: static; }
+  .card { border: 0; padding: 0; gap: 6px; }
+  .card h2 { font-size: 13pt; }
+  .ings li { padding: 3px 0; grid-template-columns: 14px 1fr auto; gap: 6px; }
+  .ings .st { width: 12px; height: 12px; font-size: 8px; }
+  .nutr div { padding: 4px; }
+  .nutr b { font-size: 11pt; }
+  .steps { gap: 4px; }
+  .steps li { padding: 5px 8px; break-inside: avoid; background: none; border-bottom: 1px solid var(--line); border-radius: 0; }
+  .steps li::before { width: 20px; height: 20px; font-size: 9pt; }
+  .steps .tm { display: none; }
+  .tip, .drinks { padding: 6px 10px; break-inside: avoid; }
+  .r-head::after { content: "Что приготовить · vladislavbropiton.github.io/povar"; font-size: 8pt; color: var(--muted); }
 }

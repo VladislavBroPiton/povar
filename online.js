@@ -34,7 +34,7 @@ function aiCtx() {
   return {
     city: S.city ? S.city.n : '',
     have: S.have.map(t => tokenName(t)), diets: S.diets.map(k => DIETS[k]), ex: S.ex.map(t => tokenName(t)),
-    serv: S.serv || 0
+    serv: S.serv || 0, lang: window.LANG || 'ru'
   };
 }
 const nl2br = s => esc(s).replace(/\n/g, '<br>');
@@ -137,7 +137,7 @@ async function fridgePhoto(file) {
 }
 
 // ---------- Синхронизация между устройствами ----------
-const SYNC_FIELDS = ['fav', 'notes', 'own', 'have', 'dates', 'plan', 'planOpt', 'diets', 'ex', 'list'];
+const SYNC_FIELDS = ['fav', 'notes', 'own', 'have', 'dates', 'plan', 'planOpt', 'diets', 'ex', 'list', 'profile', 'diary'];
 let syncT = 0, syncBusy = false, lastSyncJSON = '';
 function syncPayload() { const d = {}; for (const k of SYNC_FIELDS) if (!(k === 'list' && S.family)) d[k] = S[k]; return d; }
 function afterSave() {
@@ -170,7 +170,7 @@ function syncHTML() {
   if (!API) return '';
   return `<section class="card" id="syncCard"><h2>Телефон и компьютер вместе</h2>
     ${S.syncCode ? `<p>Код синхронизации: <b class="code">${esc(S.syncCode)}</b></p>
-      <p class="small muted">Введите этот код на другом устройстве — избранное, свои рецепты, заметки, меню и «что есть дома» будут общими${S.syncAt ? '. Последнее сохранение: ' + esc(new Date(S.syncAt).toLocaleString('ru-RU')) : ''}</p>
+      <p class="small muted">Введите этот код на другом устройстве — избранное, свои рецепты, заметки, меню и «что есть дома» будут общими${S.syncAt ? '. Последнее сохранение: ' + esc(new Date(S.syncAt).toLocaleString(window.LANG === 'en' ? 'en-GB' : 'ru-RU')) : ''}</p>
       <div class="row"><button class="btn sm" type="button" data-act="synccopy">Скопировать код</button><button class="btn sm ghost" type="button" data-act="syncoff">Отключить на этом устройстве</button></div>`
     : `<p class="small muted">Сохраните избранное, свои рецепты, заметки и меню, чтобы открыть их на другом устройстве. Без регистрации: достаточно кода</p>
       <div class="row"><button class="btn primary sm" type="button" data-act="syncnew">Создать код</button></div>

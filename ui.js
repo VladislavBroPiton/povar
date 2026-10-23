@@ -156,8 +156,8 @@ function openBuySheet(name) {
 // ---------- Общие куски ----------
 const coef = () => regionCoef(S.city);
 const priceOn = () => showPrice(S.city);
-function photo(r) {
-  if (r.img) return `<img src="${esc(r.img)}" alt="${esc(r.t)}" loading="lazy" decoding="async" onerror="this.remove()">`;
+function photo(r, small) {
+  if (r.img) return `<img src="${esc(small && r.th ? r.th : r.img)}" alt="${esc(r.t)}" loading="lazy" decoding="async" onerror="this.remove()">`;
   return '';
 }
 function starsText(id) { const n = S.notes[id] && S.notes[id].s; return n ? '★'.repeat(n) : ''; }
@@ -172,12 +172,19 @@ function card(row, H) {
   const pill = H.size && !row.miss.length ? '<span class="pill ok">Всё есть</span>' : H.size ? `<span class="pill">Не хватает ${row.miss.length}</span>` : r.own ? '<span class="pill">Мой рецепт</span>' : '';
   const st = starsText(r.id);
   return `<a class="rcard" href="#/r/${esc(r.id)}">
-    <div class="ph"><span class="fallback" aria-hidden="true">${KIND_ICON[r.kind] || '🍽️'}</span>${photo(r)}${pill}</div>
+    <div class="ph"><span class="fallback" aria-hidden="true">${KIND_ICON[r.kind] || '🍽️'}</span>${photo(r, true)}${pill}</div>
     <div class="body">
       <h3>${esc(r.t)}</h3>
       <div class="meta"><span>${r.time} мин</span><span>${Math.round(r.ps[0])} ккал</span><span>Б ${Math.round(r.ps[1])} · Ж ${Math.round(r.ps[2])} · У ${Math.round(r.ps[3])}</span>${priceOn() && r.cost ? `<span>≈ ${fmtRub(r.cost * coef())} / порция</span>` : ''}${st ? `<span class="stars">${st}</span>` : ''}</div>
+      ${algHTML(r)}
       ${need}
     </div></a>`;
+}
+function algHTML(r, full) {
+  const a = allergens(r);
+  if (!a.length) return '';
+  return full ? `<p class="alg-full"><b>Аллергены:</b> ${a.map(x => `${x.ic} ${esc(x.n.toLowerCase())}`).join(', ')}</p>`
+    : `<div class="alg" aria-label="Аллергены: ${esc(a.map(x => x.n).join(', '))}">${a.map(x => `<span title="${esc(x.n)}">${x.ic}</span>`).join('')}</div>`;
 }
 function chipsHTML(field, dict, single) {
   const on = k => single ? String(S[field]) === String(k) : S[field].includes(k);
@@ -192,7 +199,19 @@ function linksHTML(list) {
 }
 const POPULAR = ['egg', 'g:chicken', 'potato', 'onion', 'carrot', 'pasta', 'rice', 'buckwheat', 'g:mince', 'g:cheese', 'milk', 'tomato', 'cabbage', 'cottage', 'flour', 'g:fish'];
 const LEFTOVERS = ['rice_cooked', 'buckwheat_cooked', 'pasta_cooked', 'potato_boiled', 'chicken_cooked', 'beef_cooked', 'bread_stale'];
-const COLL_ICON = { newyear: '🎄', maslenitsa: '🥞', easter: '🥚', post: '🌿', ramadan: '🌙', pesach: '🍷', bday: '🎈', picnic: '🧺', leftover: '♻️' };
+// Иконки подборок: свои рисунки в фирменном цвете, с лёгкой анимацией у подборки «сейчас» и при наведении
+const ci = (cls, body) => `<svg class="ci ${cls}" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+const COLL_ICON = {
+  newyear: ci('ci-twinkle', '<path d="M12 3 6 12h3l-4 6h14l-4-6h3z"/><path d="M12 18v3"/><circle class="spark" cx="12" cy="3" r="1.2"/>'),
+  maslenitsa: ci('ci-steam', '<ellipse cx="12" cy="17" rx="8" ry="2.5"/><ellipse cx="12" cy="14" rx="7" ry="2.2"/><path class="st" d="M9 9c-1-1.5 1-2.5 0-4M13 9c-1-1.5 1-2.5 0-4"/>'),
+  easter: ci('ci-wobble', '<path d="M12 3c3.5 0 6 5 6 9.5A6 6 0 0 1 6 12.5C6 8 8.5 3 12 3Z"/><path d="M6.5 12.5c2-1 3.5 1 5.5 0s3.5 1 5.5 0"/>'),
+  post: ci('ci-sway', '<path d="M5 19C5 10 11 5 19 5c0 8-5 14-14 14Z"/><path d="M5 19 13 11"/>'),
+  ramadan: ci('ci-glow', '<path d="M16 4a8 8 0 1 0 4 12A6.5 6.5 0 0 1 16 4Z"/><path class="spark" d="m18 7 .6 1.4 1.4.6-1.4.6L18 11l-.6-1.4L16 9l1.4-.6Z"/>'),
+  pesach: ci('ci-tilt', '<path d="M7 4h10l-1 7a4 4 0 0 1-8 0Z"/><path d="M12 15v5M8 20h8"/>'),
+  bday: ci('ci-float', '<ellipse cx="12" cy="9" rx="5" ry="6"/><path d="m11 15-1 1.5h4L13 15M12 16.5c0 2-2 2.5-1 4.5"/>'),
+  picnic: ci('ci-bounce', '<path d="M4 10h16l-2 9H6Z"/><path d="M8 10a4 4 0 0 1 8 0M4 14h16"/>'),
+  leftover: ci('ci-spin', '<path d="M7 7a7 7 0 0 1 11 2M17 17a7 7 0 0 1-11-2"/><path d="M18 4v5h-5M6 20v-5h5"/>')
+};
 const EMPTY_SVG = {
   pot: '<svg class="ill" viewBox="0 0 120 90" aria-hidden="true"><path d="M20 44h80v10a32 32 0 0 1-32 32H52a32 32 0 0 1-32-32Z"/><path d="M12 44h96"/><path d="M45 34c-4-6 4-10 0-16M60 32c-4-6 4-10 0-16M75 34c-4-6 4-10 0-16" class="steam"/></svg>',
   list: '<svg class="ill" viewBox="0 0 120 90" aria-hidden="true"><rect x="30" y="10" width="60" height="74" rx="8"/><path d="M42 30h36M42 44h36M42 58h24"/><path d="m36 30 2 2 4-4M36 44l2 2 4-4" /></svg>',
@@ -340,7 +359,8 @@ function webLinks(q) {
 function updateResults(more) {
   shown = more ? shown + 24 : 24;
   summaries();
-  const { rows, H, exp } = compute(S, { titleWords });
+  const ES = typeof effS === 'function' ? effS() : S;
+  const { rows, H, exp } = compute(ES, { titleWords });
   const box = $('#results');
   const any = S.have.length || S.want.length || S.ex.length || S.meal.length || S.kind.length || S.goals.length || S.methods.length || S.diets.length || S.cuisine.length || S.occ || S.age || S.time || S.lvl || titleWords.length;
   let h = `<div class="results-head"><h2>${rows.length ? `Нашёл ${rows.length} ${plural(rows.length, 'рецепт', 'рецепта', 'рецептов')}` : 'Ничего не нашлось'}</h2>
@@ -352,6 +372,10 @@ function updateResults(more) {
   if (S.occ && COLLS[S.occ].note) h += `<div class="notice">${esc(COLLS[S.occ].n)}: ${esc(COLLS[S.occ].note)}</div>`;
   if (exp.length) h += `<div class="notice warn">Скоро испортится: ${esc(exp.map(x => tokenName(x.t).toLowerCase() + ' (' + (x.days < 0 ? 'срок вышел' : x.days === 0 ? 'сегодня' : x.days === 1 ? 'завтра' : 'через ' + x.days + ' дня') + ')').join(', '))}. Блюда с ними — первыми</div>`;
   if (lastNotice) h += `<div class="notice">${lastNotice}</div>`;
+  const om = oneMore(ES);
+  h += hook('profileNoticeHTML');
+  if (om) h += `<div class="notice ok one-more"><span>Купите только <b>${esc(ING[om.id].n.toLowerCase())}</b> — и откроются ещё ${om.n} ${plural(om.n, 'блюдо', 'блюда', 'блюд')}</span>
+    <div class="row"><button class="btn sm primary" type="button" data-om-buy="${om.id}">В список покупок</button><button class="btn sm" type="button" data-om-show="${om.id}">Показать эти блюда</button></div></div>`;
   if (H.size && rows.length) {
     const full = rows.filter(x => !x.miss.length).length;
     h += `<div class="notice ${full ? 'ok' : ''}">${full ? `Из того, что есть, можно приготовить ${full} ${plural(full, 'блюдо', 'блюда', 'блюд')} без похода в магазин` : 'Без магазина не обойтись: сверху блюда, где докупить меньше всего'}</div>`;
@@ -367,6 +391,10 @@ function updateResults(more) {
   const r2 = $('#resetBtn2'); if (r2) r2.addEventListener('click', resetFilters);
   const mb = $('#moreBtn'); if (mb) mb.addEventListener('click', () => { const y = scrollY; updateResults(true); scrollTo(0, y); });
   $$('[data-view]', box).forEach(b => b.addEventListener('click', () => { S.view = b.dataset.view; save(); updateResults(); }));
+  const omb = $('[data-om-buy]', box);
+  if (omb) omb.addEventListener('click', () => { addItemsToList([{ id: omb.dataset.omBuy, g: 0 }], 'чтобы открыть больше блюд'); flyTo(omb, '.tabs [data-tab="list"] svg'); toast('Добавлено в список покупок'); });
+  const oms = $('[data-om-show]', box);
+  if (oms) oms.addEventListener('click', () => { addToken('want', oms.dataset.omShow); });
   if (!rows.length && any) track('notfound', { q: searchQueryText() });
 }
 function resetFilters() {
@@ -593,12 +621,15 @@ function drawRecipe(r) {
         <p class="lead">${esc(r.d)}</p>
         ${hook('recipeExtraHTML', r)}
         <div class="facts">${facts}</div>
+        ${algHTML(r, true)}
+        ${hook('profileFitHTML', r)}
         <div class="row no-print">
           <button class="btn primary" type="button" id="cookBtn">▶ Готовить пошагово</button>
           <button class="btn${fav ? ' on-fav' : ''}" type="button" id="favBtn">${fav ? '♥ В избранном' : '♡ В избранное'}</button>
           <button class="btn" type="button" id="shareBtn">Поделиться</button>
           <button class="btn" type="button" id="printBtn">Распечатать</button>
           ${r.own ? `<a class="btn" href="#/my/edit/${esc(r.id)}">Изменить</a>` : ''}
+          ${hook('recipeButtonsHTML', r)}
         </div>
         <label class="switch no-print"><input type="checkbox" id="wakeChk"${wakeLock ? ' checked' : ''}> Не гасить экран, пока готовлю</label>
       </div>
@@ -620,6 +651,8 @@ function drawRecipe(r) {
         <p class="small muted no-print">Нажмите на шаг, чтобы отметить его сделанным. Кнопка ⏱ запускает таймер</p>
         <ol class="steps">${steps}</ol>
         ${r.tip ? `<div class="tip"><b>Совет.</b> ${esc(r.tip)}</div>` : ''}
+        ${drinksHTML(r)}
+        ${hook('stepMediaHTML', r)}
         <div class="mynote no-print">
           <h3>Мои заметки</h3>
           <div class="row"><div class="rate" role="group" aria-label="Моя оценка">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-star="${n}" class="${(note.s || 0) >= n ? 'on' : ''}" aria-label="${n} из 5">★</button>`).join('')}</div>
@@ -632,8 +665,19 @@ function drawRecipe(r) {
         ${linksHTML(media)}
       </section>
     </div>
+    ${similarHTML(r)}
   </article>`;
   bindRecipe(r);
+}
+function drinksHTML(r) {
+  const d = drinks(r, { noAlcohol: S.diets.includes('halal') || S.age > 0 || S.goals.includes('kids') });
+  if (!d.soft.length && !d.wine.length) return '';
+  return `<div class="drinks"><b>Что подать к столу.</b> ${esc(d.soft.join(', '))}${d.wine.length ? `. Взрослым: ${esc(d.wine.join(' или '))}` : ''}</div>`;
+}
+function similarHTML(r) {
+  const list = similar(r);
+  if (!list.length) return '';
+  return `<section class="similar no-print"><h2>Похожие блюда</h2><div class="grid">${list.map(x => card({ r: x, miss: [] }, new Set())).join('')}</div></section>`;
 }
 function setNote(id, patch) { S.notes[id] = { ...(S.notes[id] || {}), ...patch }; save(); }
 function flyTo(from, toSel) {
@@ -880,14 +924,15 @@ function renderPlan() {
         <h2>Итог меню</h2>
         <div class="nutr"><div><b>${Math.round(tot.perDay[0])}</b><span>ккал в день</span></div><div><b>${Math.round(tot.perDay[1])}</b><span>белки, г</span></div><div><b>${Math.round(tot.perDay[2])}</b><span>жиры, г</span></div><div><b>${Math.round(tot.perDay[3])}</b><span>углеводы, г</span></div></div>
         <p class="small muted">На одного человека в среднем за день${priceOn() ? `. Продукты на всё меню на ${p.people} ${plural(p.people, 'человека', 'человек', 'человек')}: примерно ${fmtRub(tot.cost)}` : ''}</p>
+        ${hook('planShareHTML')}
         <button class="btn primary" type="button" id="planToList">Купить для всего меню: ${toBuy.length} ${plural(toBuy.length, 'продукт', 'продукта', 'продуктов')}</button>
         <details><summary class="small">Что входит в список</summary><p class="small muted">${esc(toBuy.map(([id, g]) => ING[id].n + ' ' + fmtGrams(g, ING[id].fl.includes('l'))).join(', ') || 'всё есть дома')}</p></details>
       </section>
       <div class="plan-days">${p.days.map((day, d) => {
         const date = new Date(start.getTime() + d * 864e5);
-        return `<section class="card plan-day"><h3>${esc(date.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }))}</h3>
+        return `<section class="card plan-day"><h3>${esc(date.toLocaleDateString(window.LANG === 'en' ? 'en-GB' : 'ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }))}</h3>
           ${p.meals.map(slot => { const r = RBYID[day[slot]]; if (!r) return ''; return `<div class="slot"><span class="slot-name">${SLOT_NAMES[slot]}</span>
-            <a class="slot-r" href="#/r/${esc(r.id)}"><span class="thumb">${photo(r) || KIND_ICON[r.kind]}</span><span><b>${esc(r.t)}</b><small>${r.time} мин · ${Math.round(r.ps[0])} ккал${priceOn() ? ' · ≈ ' + fmtRub(r.cost * coef() * p.people) : ''}</small></span></a>
+            <a class="slot-r" href="#/r/${esc(r.id)}"><span class="thumb">${photo(r, true) || KIND_ICON[r.kind]}</span><span><b>${esc(r.t)}</b><small>${r.time} мин · ${Math.round(r.ps[0])} ккал${priceOn() ? ' · ≈ ' + fmtRub(r.cost * coef() * p.people) : ''}</small></span></a>
             <button class="btn sm ghost" type="button" data-swap="${d}:${slot}" aria-label="Заменить блюдо">↻</button></div>`; }).join('')}
         </section>`;
       }).join('')}</div>`;
@@ -912,8 +957,8 @@ function renderPlan() {
     else if (b.dataset.slot) { const k = b.dataset.slot; o.meals = o.meals.includes(k) ? o.meals.filter(x => x !== k) : [...o.meals, k]; if (!o.meals.length) o.meals = [k]; o.meals.sort((a, b2) => Object.keys(SLOT_NAMES).indexOf(a) - Object.keys(SLOT_NAMES).indexOf(b2)); save(); renderPlan(); }
     else if (b.dataset.pgoal !== undefined) { o.goal = b.dataset.pgoal; save(); renderPlan(); }
     else if (b.dataset.budget !== undefined) { o.budget = !o.budget; save(); renderPlan(); }
-    else if (b.id === 'makePlan') { S.plan = makePlan(S, { ...o, seed: Date.now() }); S.plan.start = new Date().toDateString(); save(); renderPlan(); track('plan', { days: o.days }); }
-    else if (b.dataset.swap) { const [d, slot] = b.dataset.swap.split(':'); replaceInPlan(S, S.plan, +d, slot); save(); renderPlan(); }
+    else if (b.id === 'makePlan') { S.plan = makePlan(hook('effS') || S, { ...o, seed: Date.now() }); S.plan.start = new Date().toDateString(); save(); renderPlan(); track('plan', { days: o.days }); }
+    else if (b.dataset.swap) { const [d, slot] = b.dataset.swap.split(':'); replaceInPlan(hook('effS') || S, S.plan, +d, slot); save(); renderPlan(); }
     else if (b.id === 'planToList') {
       const tot = planTotals(S.plan, S.city); const H = haveSet(S);
       const items = Object.entries(tot.need).filter(([id]) => !isStaple(id) && itemStatus(id, H).s === 'miss').map(([id, g]) => ({ id, g }));
@@ -931,6 +976,7 @@ function renderFav() {
   const cooked = Object.entries(S.notes).filter(([id, n]) => n.c && RBYID[id]).sort((a, b) => (b[1].last || '').localeCompare(a[1].last || '')).slice(0, 8).map(([id]) => ({ r: RBYID[id], miss: [] }));
   app.innerHTML = `<div class="page">
     <h1>Избранное</h1>
+    <div class="row"><a class="btn" href="#/family">👨‍👩‍👧 Наша семья</a><a class="btn" href="#/diary">📒 Дневник питания</a></div>
     ${rows.length ? `<div class="grid">${rows.map(x => card(x, H)).join('')}</div>` : `<div class="empty">${EMPTY_SVG.heart}<p>Здесь будут рецепты, которые вы отметили ♡</p><a class="btn primary" href="#/">Подобрать рецепт</a></div>`}
     <div class="results-head"><h2>Мои рецепты</h2><a class="btn primary" href="#/my/new">+ Добавить свой рецепт</a></div>
     ${mine.length ? `<div class="grid">${mine.map(x => card(x, new Set())).join('')}</div>` : '<p class="muted">Добавьте бабушкин рецепт: сайт сам посчитает БЖУ, цену и пересчитает на любое число порций</p>'}
@@ -1095,18 +1141,33 @@ window.addEventListener('appinstalled', () => { $('#installBtn').hidden = true; 
 let TG = null;
 function initTelegram() {
   if (!/tgWebApp/.test(location.hash + location.search)) return;
-  history.replaceState(null, '', location.pathname + '#/');
+  // Telegram дописывает к адресу свои данные: оставляю только нашу часть (#/r/…, #/join/…, #/?have=…)
+  const h = location.hash, cut = h.search(/[#&?]tgWebApp/);
+  const keep = cut > 1 ? h.slice(0, cut) : '#/';
+  history.replaceState(null, '', location.pathname + (keep.startsWith('#/') ? keep : '#/'));
   document.documentElement.classList.add('in-tg');
   const sc = document.createElement('script');
   sc.src = 'https://telegram.org/js/telegram-web-app.js';
   sc.onload = () => {
     TG = window.Telegram && window.Telegram.WebApp; if (!TG) return;
     TG.ready(); TG.expand();
-    if (TG.colorScheme === 'dark' && !document.documentElement.dataset.theme) document.documentElement.dataset.theme = 'dark';
+    applyTgTheme();
+    TG.onEvent('themeChanged', applyTgTheme);
     TG.BackButton.onClick(() => history.back());
     syncTgBack();
   };
   document.head.appendChild(sc);
+}
+// цвета сайта внутри Telegram берутся из темы самого Telegram у человека
+function applyTgTheme() {
+  const p = TG && TG.themeParams; if (!p || !p.bg_color) return;
+  const st = document.documentElement.style;
+  const set = (v, c) => { if (c) st.setProperty(v, c); };
+  if (!document.documentElement.dataset.theme) document.documentElement.dataset.theme = TG.colorScheme === 'dark' ? 'dark' : 'light';
+  set('--bg', p.secondary_bg_color || p.bg_color); set('--surface', p.bg_color); set('--text', p.text_color);
+  set('--muted', p.hint_color); set('--accent', p.button_color); set('--accent-text', p.button_text_color);
+  set('--surface-2', p.secondary_bg_color); set('--line', p.section_separator_color || p.hint_color + '40');
+  try { TG.setHeaderColor(p.bg_color); TG.setBackgroundColor(p.secondary_bg_color || p.bg_color); } catch { /* старый Telegram */ }
 }
 function syncTgBack() { if (TG) (location.hash && location.hash !== '#/' ? TG.BackButton.show() : TG.BackButton.hide()); }
 
@@ -1123,7 +1184,7 @@ function route() {
   document.title = 'Что приготовить';
   syncTgBack();
   const go = (view, t, fn) => { curView = view; tab(t); fn(); scrollTo(0, 0); };
-  const extra = hook('onlineRoute', h);
+  const extra = hook('onlineRoute', h) || hook('extraRoute', h);
   if (extra) return go(extra[0], extra[1], extra[2]);
   if (h.startsWith('#/r/')) return go('recipe', 'find', () => renderRecipe(decodeURIComponent(h.slice(4))));
   if (h === '#/list') return go('list', 'list', renderList);
