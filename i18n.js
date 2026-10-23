@@ -20,6 +20,7 @@ window.LANG = LANG;
   document.documentElement.lang = 'en';
   const DICT = Object.assign({}, window.I18N_EN || {});
   const ENG = window.ING_EN || {};
+  DICT['Что приготовить из того, что есть дома — рецепты с БЖУ'] = 'What to cook with what you have — recipes with nutrition facts';
   for (const r of window.ING_RAW) {
     const en = ENG[r[0]]; if (!en) continue;
     // в тексте названия встречаются и с заглавной, и строчными, и без пометки в скобках

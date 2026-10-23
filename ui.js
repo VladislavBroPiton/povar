@@ -6,6 +6,7 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const app = $('#app');
 const wide = () => matchMedia('(min-width: 1000px)').matches;
+const HOME_TITLE = document.title;
 const BASE = location.origin + location.pathname.replace(/[^/]*$/, '');
 // Места, куда встраиваются функции сервера из online.js (если файла нет — пусто)
 const hook = (name, ...args) => typeof window[name] === 'function' ? window[name](...args) : '';
@@ -1181,7 +1182,7 @@ function route() {
   app.onclick = null; app.onchange = null;
   $$('.tabs a').forEach(a => a.classList.remove('on'));
   const tab = n => { const a = $(`.tabs [data-tab="${n}"]`); if (a) a.classList.add('on'); };
-  document.title = 'Что приготовить';
+  document.title = HOME_TITLE;
   syncTgBack();
   const go = (view, t, fn) => { curView = view; tab(t); fn(); scrollTo(0, 0); };
   const extra = hook('onlineRoute', h) || hook('extraRoute', h);
