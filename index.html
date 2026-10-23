@@ -1,123 +1,31 @@
 <!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="dev">
-<title>Что приготовить из того, что есть дома — рецепты с БЖУ</title>
-<meta name="description" content="Подберём рецепт из продуктов, что есть дома, с учётом города, цели и способа готовки. 216 рецептов с БЖУ, меню на неделю, список покупок, ИИ-повар">
-<meta name="keywords" content="что приготовить, рецепты из того что есть, рецепты с БЖУ, меню на неделю, список покупок, рецепты на ужин, рецепты для детей, постные рецепты, кашерные рецепты, халяль рецепты">
-<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-<meta name="author" content="Что приготовить">
-<meta name="application-name" content="Что приготовить">
-<meta name="format-detection" content="telephone=no">
-<link rel="canonical" href="https://vladislavbropiton.github.io/povar/">
-<link rel="sitemap" type="application/xml" href="sitemap.xml">
-<meta name="theme-color" content="#f7f3ec" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1c1916" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="favicon.ico" sizes="32x32">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Готовим">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<!-- Превью ссылки в соцсетях и мессенджерах -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Что приготовить">
-<meta property="og:locale" content="ru_RU">
-<meta property="og:locale:alternate" content="en_US">
-<meta property="og:title" content="Что приготовить из того, что есть дома">
-<meta property="og:description" content="Рецепты под ваши продукты, город и цель: БЖУ, меню на неделю, список покупок и ИИ-повар. Бесплатно">
-<meta property="og:url" content="https://vladislavbropiton.github.io/povar/">
-<meta property="og:image" content="https://vladislavbropiton.github.io/povar/og/home.jpg">
-<meta property="og:image:width" content="960">
-<meta property="og:image:height" content="504">
-<meta property="og:image:alt" content="Блюда и надпись «Что приготовить из того, что есть дома»">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Что приготовить из того, что есть дома">
-<meta name="twitter:description" content="Рецепты под ваши продукты, город и цель: БЖУ, меню на неделю, список покупок и ИИ-повар">
-<meta name="twitter:image" content="https://vladislavbropiton.github.io/povar/og/home.jpg">
-<!-- Разметка для поисковиков: что это за сайт -->
-<script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
-{"@type":"WebSite","@id":"https://vladislavbropiton.github.io/povar/#site","url":"https://vladislavbropiton.github.io/povar/","name":"Что приготовить","alternateName":"What to cook","inLanguage":["ru","en"],"description":"Подбор рецептов из продуктов, которые есть дома, с учётом города, цели и способа готовки"},
-{"@type":"WebApplication","name":"Что приготовить","url":"https://vladislavbropiton.github.io/povar/","applicationCategory":"LifestyleApplication","operatingSystem":"Любая: браузер на телефоне, планшете или компьютере","inLanguage":["ru","en"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"RUB"},"featureList":["Подбор рецептов из того, что есть дома","Учёт города: магазины и доставка рядом","БЖУ и цена порции","Меню на неделю и список покупок","ИИ-повар и распознавание продуктов по фото","Рецепты для детей, постные, кашерные, халяль"]},
-{"@type":"Organization","@id":"https://vladislavbropiton.github.io/povar/#org","name":"Что приготовить","url":"https://vladislavbropiton.github.io/povar/","logo":"https://vladislavbropiton.github.io/povar/icons/icon-512.png","sameAs":["https://t.me/kulinar_pomoshchnik_bot"]}
-]}
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Что приготовить переехал на kindtools.github.io</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://kindtools.github.io/">
+<style>body{margin:0;font:17px/1.5 system-ui,sans-serif;background:#f7f3ec;color:#2b1e16;display:grid;place-items:center;min-height:100vh;padding:16px;box-sizing:border-box;text-align:center}a{color:#b4532f}</style>
+<script>
+// Старый адрес. Переношу человека на новый сайт вместе с его данными (избранное, списки, холодильник, настройки)
+(function () {
+  var NEW = 'https://kindtools.github.io/';
+  var path = location.pathname.replace(/^\/povar\/?/, '');
+  if (/^(index\.html)?$/.test(path)) path = '';
+  var hash = location.hash || '';
+  var data = {};
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf('cook.') === 0) data[k] = localStorage.getItem(k);
+    }
+  } catch (e) { /* без данных */ }
+  var url = NEW + path;
+  if (!path && Object.keys(data).length) {
+    var b = btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    url = NEW + '#/import=' + b + hash;
+  } else {
+    url += hash;
+  }
+  location.replace(url);
+})();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&display=swap">
-<link rel="stylesheet" href="app.css?v=7">
-</head>
-<body>
-<header class="top">
-  <a class="logo" href="#/" aria-label="На главную">
-    <img src="icons/icon-192.png" alt="" width="32" height="32">
-    <span>Что приготовить</span>
-  </a>
-  <button class="city-btn" id="cityBtn" type="button" aria-label="Выбрать город">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-    <span id="cityName">Город…</span>
-  </button>
-  <button class="lang-btn" id="langBtn" type="button">EN</button>
-  <button class="install-btn" id="installBtn" type="button" hidden>Установить</button>
-</header>
-
-<div class="city-confirm" id="cityConfirm" hidden>
-  <p id="cityConfirmText">Похоже, вы в городе…</p>
-  <div class="row">
-    <button class="btn primary" id="cityYes" type="button">Да, верно</button>
-    <button class="btn" id="cityNo" type="button">Другой город</button>
-  </div>
-</div>
-
-<nav class="tabs" aria-label="Разделы">
-  <a href="#/" data-tab="find"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>Подбор</span></a>
-  <a href="#/plan" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3M8 17h6"/></svg><span>Меню</span></a>
-  <a href="#/list" data-tab="list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h2M4 12h2M4 18h2M9 6h11M9 12h11M9 18h11"/></svg><span>Покупки</span><b class="badge" id="listBadge" hidden></b></a>
-  <a href="#/fav" data-tab="fav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg><span>Избранное</span></a>
-  <a href="#/help" data-tab="help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg><span>Шпаргалки</span></a>
-</nav>
-
-<main id="app" tabindex="-1">
-  <div class="page seo-fallback">
-    <h1>Что приготовить из того, что есть дома</h1>
-    <p>Напишите, какие продукты есть дома, и сайт подберёт рецепты: с учётом вашего города, цели (белковое, мало калорий, для детей, постное, кашерное, халяль), способа готовки и числа гостей. У каждого рецепта БЖУ, примерная цена порции, фото, видео, пересчёт порций и список покупок</p>
-    <ul>
-      <li>216 рецептов: русская, кавказская, среднеазиатская, татарская, еврейская, азиатская, итальянская кухни</li>
-      <li>Меню на неделю с общим списком покупок</li>
-      <li>ИИ-повар: ответит на вопрос о готовке и узнает продукты по фото холодильника</li>
-      <li>Работает на телефоне, планшете и компьютере, устанавливается как приложение</li>
-    </ul>
-    <h2>Популярные рецепты</h2>
-    <ul><li><a href="r/borshch.html">Борщ</a></li><li><a href="r/syrniki.html">Сырники</a></li><li><a href="r/plov-uzbekskij-s-baraninoj.html">Плов узбекский с бараниной</a></li><li><a href="r/bliny-na-moloke.html">Блины на молоке</a></li><li><a href="r/olivie.html">Оливье</a></li><li><a href="r/shakshuka.html">Шакшука</a></li><li><a href="r/harcho.html">Суп харчо</a></li><li><a href="r/kotlety-domashnie.html">Котлеты домашние жареные</a></li><li><a href="r/sharlotka.html">Шарлотка с яблоками</a></li><li><a href="r/draniki.html">Драники</a></li><li><a href="r/lagman.html">Лагман</a></li><li><a href="r/tefteli-v-tomatnom-souse.html">Тефтели в томатном соусе</a></li></ul>
-    <p><a href="r/">Все рецепты списком</a> · <a href="q/">Подборки: из курицы, быстрый ужин, ПП</a> · <a href="https://t.me/kulinar_pomoshchnik_bot">Бот в Telegram</a></p>
-  </div>
-</main>
-
-<div class="timer-bar" id="timerBar" hidden></div>
-
-<dialog id="sheet" class="sheet">
-  <div class="sheet-body" id="sheetBody"></div>
-</dialog>
-
-<noscript><p style="padding:24px">Для работы сайта включите JavaScript.</p></noscript>
-
-<script src="config.js?v=7"></script>
-<script src="data/ingredients.js?v=7"></script>
-<script src="data/cities.js?v=7"></script>
-<script src="data/recipes.js?v=7"></script>
-<script src="data/help.js?v=7"></script>
-<script src="data/steps.js?v=7"></script>
-<script src="data/i18n-en.js?v=7"></script>
-<script src="core.js?v=7"></script>
-<script src="i18n.js?v=7"></script>
-<script src="ui.js?v=7"></script>
-<script src="online.js?v=7"></script>
-<script src="extra.js?v=7"></script>
-<script src="more.js?v=7"></script>
-</body>
-</html>
+</head><body><p>Сайт «Что приготовить» переехал на <a href="https://kindtools.github.io/">kindtools.github.io</a>. Сейчас откроется новый адрес</p></body></html>

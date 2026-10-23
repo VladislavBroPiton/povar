@@ -1,3 +1,2 @@
 User-agent: *
 Allow: /
-Sitemap: https://vladislavbropiton.github.io/povar/sitemap.xml

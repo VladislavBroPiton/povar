@@ -1,20 +1,31 @@
 <!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Страница не найдена — Что приготовить</title>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Что приготовить переехал на kindtools.github.io</title>
 <meta name="robots" content="noindex">
-<link rel="icon" href="/povar/favicon.ico" sizes="32x32">
-<link rel="stylesheet" href="/povar/app.css?v=7">
-<style>body{padding:0}.nf{max-width:620px;margin:10vh auto;padding:24px;display:grid;gap:16px;text-align:center;justify-items:center}.nf .ill{width:150px;height:110px}</style>
-</head>
-<body>
-<main class="nf">
-  <svg class="ill" viewBox="0 0 120 90" aria-hidden="true"><path d="M20 44h80v10a32 32 0 0 1-32 32H52a32 32 0 0 1-32-32Z"/><path d="M12 44h96"/><path d="M45 34c-4-6 4-10 0-16M60 32c-4-6 4-10 0-16M75 34c-4-6 4-10 0-16" class="steam"/></svg>
-  <h1>Такой страницы нет</h1>
-  <p class="muted">Возможно, ссылка устарела или в ней опечатка. Зато рецептов у нас много</p>
-  <div class="row" style="justify-content:center"><a class="btn primary" href="/povar/">Подобрать рецепт</a><a class="btn" href="/povar/r/">Все рецепты</a></div>
-</main>
-</body>
-</html>
+<link rel="canonical" href="https://kindtools.github.io/">
+<style>body{margin:0;font:17px/1.5 system-ui,sans-serif;background:#f7f3ec;color:#2b1e16;display:grid;place-items:center;min-height:100vh;padding:16px;box-sizing:border-box;text-align:center}a{color:#b4532f}</style>
+<script>
+// Старый адрес. Переношу человека на новый сайт вместе с его данными (избранное, списки, холодильник, настройки)
+(function () {
+  var NEW = 'https://kindtools.github.io/';
+  var path = location.pathname.replace(/^\/povar\/?/, '');
+  if (/^(index\.html)?$/.test(path)) path = '';
+  var hash = location.hash || '';
+  var data = {};
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf('cook.') === 0) data[k] = localStorage.getItem(k);
+    }
+  } catch (e) { /* без данных */ }
+  var url = NEW + path;
+  if (!path && Object.keys(data).length) {
+    var b = btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    url = NEW + '#/import=' + b + hash;
+  } else {
+    url += hash;
+  }
+  location.replace(url);
+})();
+</script>
+</head><body><p>Сайт «Что приготовить» переехал на <a href="https://kindtools.github.io/">kindtools.github.io</a>. Сейчас откроется новый адрес</p></body></html>
