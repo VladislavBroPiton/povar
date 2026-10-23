@@ -32,8 +32,7 @@ jobs:
       - name: Проверка в браузере (телефон, планшет, компьютер)
         timeout-minutes: 8
         run: |
-          npm i --no-save --no-package-lock playwright@1.48.2
-          npx playwright install --with-deps chromium
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i --no-save --no-package-lock playwright@1.48.2
           python3 -m http.server 8790 >/dev/null 2>&1 &
           sleep 1
           node tests/smoke.mjs

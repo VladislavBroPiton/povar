@@ -17,7 +17,8 @@ const SIZES = [['телефон', 390, 844], ['телефон боком', 844, 
 // сеть до сервера и счётчиков в CI может быть недоступна — это не ошибка сайта
 const IGNORE = /Failed to load resource|net::|onrender\.com|ERR_|favicon/i;
 
-const browser = await chromium.launch();
+// в GitHub Actions Chrome уже стоит — беру его, чтобы не качать браузер (это иногда висело по 10+ минут)
+const browser = await chromium.launch(process.env.CI ? { channel: 'chrome' } : {});
 const fails = [];
 for (const [sname, w, h] of SIZES) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'ru-RU', serviceWorkers: 'block' });
