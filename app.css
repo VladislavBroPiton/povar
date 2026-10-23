@@ -95,9 +95,18 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .install-btn { border: 0; background: var(--accent); color: var(--accent-text); border-radius: 999px; padding: 7px 14px; font-weight: 600; cursor: pointer; font-size: var(--fs-s); }
 
 .city-confirm {
-  margin: 12px 16px 0; padding: 14px 16px; border-radius: var(--r); background: var(--accent-soft);
+  /* всплывает над нижним меню, а не вставляется сверху: страница под ней не прыгает */
+  position: fixed; z-index: 35; left: 12px; right: 12px; bottom: calc(var(--tabs-h) + env(safe-area-inset-bottom) + 10px);
+  padding: 14px 16px; border-radius: var(--r); background: var(--accent-soft); border: 1px solid var(--line);
+  box-shadow: 0 8px 28px rgba(40, 24, 12, .18);
   display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  animation: city-in .3s ease-out;
 }
+.city-confirm[hidden] { display: none; }
+@keyframes city-in { from { transform: translateY(16px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .city-confirm { animation: none; } }
+@media (min-width: 1000px) { .city-confirm { left: auto; right: 20px; bottom: 20px; max-width: 420px; } }
+@media (orientation: landscape) and (max-height: 520px) { .city-confirm { left: auto; right: 12px; bottom: 10px; max-width: 420px; } }
 .city-confirm p { font-weight: 600; }
 .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 

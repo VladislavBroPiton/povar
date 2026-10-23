@@ -59,6 +59,13 @@ ok(p.occ.includes('leftover') || p.want.includes('rice_cooked') || p.want.includ
 p = P('десерт за 15 минут');
 ok(p.time === 15 && p.goals.includes('sweet'), 'фраза 8: ' + JSON.stringify(p));
 
+// --- опечатки и разговорные слова ---
+ok(P('курцца с рисом').want.includes('g:chicken'), 'опечатка «курцца» → курица');
+ok(P('суп без капусиы').ex.includes('cabbage'), 'опечатка в «без капусты»');
+ok(P('макорошки с фаршем').want.includes('pasta'), '«макорошки» → макароны');
+ok(P('картофан и морковка').want.includes('potato'), '«картофан» → картошка');
+ok(!P('ужин для семьи').want.length && !P('говядина тушеная').want.includes('mushrooms'), 'обычные слова не превращаются в продукты');
+
 // --- подбор по продуктам ---
 const res = core.compute(st({ have: ['egg', 'milk', 'flour'] }));
 ok(res.rows[0].miss.length === 0, 'с яйцами, молоком и мукой первым должно идти блюдо без докупки');

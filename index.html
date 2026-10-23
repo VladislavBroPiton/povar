@@ -49,7 +49,12 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&display=swap">
+<!-- шрифт заголовков не держит отрисовку: пока грузится, заголовки показываются системным шрифтом -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&display=swap"></noscript>
+<!-- картинку первого экрана браузер начинает качать сразу, не дожидаясь скриптов -->
+<link rel="preload" as="image" href="media/hero-4x3.jpg" media="(max-width: 640px) and (orientation: portrait)">
+<link rel="preload" as="image" href="media/hero-16x9.jpg" media="not all and (max-width: 640px) and (orientation: portrait)">
 <link rel="stylesheet" href="app.css?v=7">
 </head>
 <body>

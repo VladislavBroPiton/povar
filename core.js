@@ -247,8 +247,40 @@ function parsePhrase(text) {
       break;
     }
   }
+  // второй проход: слова с опечатками («курцца», «макорошки») — ищу самое похожее название продукта
+  const single = keys.filter(k => k.ws.length === 1 && k.k.length >= 5);
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    if (used.has(i) || w.length < 5 || STOP.has(w) || /\d/.test(w)) continue;
+    let best = null;
+    for (const key of single) {
+      const ks = key.k;
+      if (ks.slice(0, 2) !== w.slice(0, 2)) continue;
+      // слово целиком или его начало длиной с название («макорошки» → «макароны» + окончание)
+      const d = Math.min(editDist(w, ks), editDist(w.slice(0, ks.length), ks));
+      const limit = ks.length >= 7 && w.length >= 7 ? 2 : 1;
+      if (d <= limit && (!best || d < best.d)) best = { d, key };
+    }
+    if (!best) continue;
+    used.add(i);
+    const neg = words[i - 1] === 'без';
+    const list = neg ? out.ex : haveMode ? out.have : out.want;
+    if (!list.includes(best.key.t)) list.push(best.key.t);
+  }
   words.forEach((w, i) => { if (!used.has(i) && w.length > 3 && !STOP.has(w) && !/^\d+$/.test(w)) out.rest.push(w); });
   return out;
+}
+// сколько букв поменять, вставить или убрать (с перестановкой соседних), чтобы из a получить b
+function editDist(a, b) {
+  const m = a.length, n = b.length;
+  if (Math.abs(m - n) > 2) return 9;
+  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[m][n];
 }
 
 // ---------- Подбор ----------

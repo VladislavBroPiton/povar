@@ -306,6 +306,13 @@ function heroVideo() {
   const conn = navigator.connection || {};
   // без ролика: экономия трафика, медленная сеть, просьба не анимировать — остаётся фото
   if (conn.saveData || /(^|-)2g|3g/.test(conn.effectiveType || '') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // ролик (~1 МБ) начинаю качать только после загрузки страницы и паузы: иначе он отбирает канал у картинки и скриптов
+  if (document.readyState !== 'complete' || !heroVideo.ready) {
+    const go = () => setTimeout(() => { heroVideo.ready = true; heroVideo(); }, 1500);
+    if (document.readyState === 'complete') go(); else addEventListener('load', go, { once: true });
+    return;
+  }
+  if ($('video', box)) return;
   const f = heroFormat();
   const v = document.createElement('video');
   Object.assign(v, { muted: true, loop: true, playsInline: true, autoplay: true, preload: 'auto', poster: `media/hero-${f}.jpg` });
