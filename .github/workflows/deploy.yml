@@ -24,7 +24,7 @@ jobs:
         run: |
           VER="$(date -u +%Y%m%d%H%M)-${GITHUB_SHA::7}"
           echo "Версия: $VER"
-          sed -i -E "s/\?v=[0-9A-Za-z-]+/?v=$VER/g" index.html 404.html sw.js r/*.html
+          sed -i -E "s/\?v=[0-9A-Za-z-]+/?v=$VER/g" index.html 404.html sw.js r/*.html q/*.html
           sed -i -E "s/const VERSION = '[^']*';/const VERSION = '$VER';/" sw.js
           sed -i -E "s/<meta name=\"app-version\" content=\"[^\"]*\">/<meta name=\"app-version\" content=\"$VER\">/" index.html
           printf '{"v":"%s"}\n' "$VER" > version.json
