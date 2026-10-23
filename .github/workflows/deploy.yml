@@ -1,5 +1,6 @@
 name: Проверка и публикация сайта
 # При каждой заливке в main: автотесты → новая версия всем файлам → публикация в gh-pages (оттуда работает сайт).
+# Перед публикацией сайт открывается в браузере на 4 размерах экрана: если есть ошибки, публикации не будет.
 # Ручной ?v= больше не нужен: версию ставит этот процесс, а сайт у посетителей сам замечает обновление.
 on:
   push:
@@ -28,10 +29,20 @@ jobs:
           sed -i -E "s/const VERSION = '[^']*';/const VERSION = '$VER';/" sw.js
           sed -i -E "s/<meta name=\"app-version\" content=\"[^\"]*\">/<meta name=\"app-version\" content=\"$VER\">/" index.html
           printf '{"v":"%s"}\n' "$VER" > version.json
+      - name: Проверка в браузере (телефон, планшет, компьютер)
+        run: |
+          npm i --no-save --no-package-lock playwright@1.48.2
+          npx playwright install --with-deps chromium
+          python3 -m http.server 8790 >/dev/null 2>&1 &
+          sleep 1
+          node tests/smoke.mjs
+          rm -rf node_modules
       - name: Публикация
         run: |
           git config user.name "deploy-bot"
           git config user.email "deploy-bot@users.noreply.github.com"
+          # черновик из ветки preview живёт в папке preview/ — не стираем его
+          git fetch -q --depth=1 origin gh-pages && git checkout FETCH_HEAD -- preview 2>/dev/null || true
           git checkout -B gh-pages
           git add -A
           git commit -q -m "Публикация ${GITHUB_SHA::7}"

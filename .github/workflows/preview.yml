@@ -1,0 +1,43 @@
+name: Черновик сайта
+# Заливка в ветку preview → сайт по адресу …/povar/preview/ для проверки перед тем, как отдать всем.
+# Поисковикам черновик закрыт. Когда всё нравится — те же правки заливаются в main.
+on:
+  push:
+    branches: [preview]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: preview
+  cancel-in-progress: true
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Автотесты
+        run: node tests/test.js
+      - name: Версия и закрытие от поисковиков
+        run: |
+          VER="preview-$(date -u +%Y%m%d%H%M)-${GITHUB_SHA::7}"
+          sed -i -E "s/\?v=[0-9A-Za-z-]+/?v=$VER/g" index.html 404.html sw.js r/*.html q/*.html
+          sed -i -E "s/const VERSION = '[^']*';/const VERSION = '$VER';/" sw.js
+          sed -i -E "s/<meta name=\"app-version\" content=\"[^\"]*\">/<meta name=\"app-version\" content=\"$VER\"><meta name=\"robots\" content=\"noindex, nofollow\">/" index.html
+          printf '{"v":"%s"}\n' "$VER" > version.json
+          printf 'User-agent: *\nDisallow: /\n' > robots.txt
+          rm -f sitemap.xml
+      - name: Публикация в папку preview/
+        run: |
+          mkdir /tmp/build && cp -r . /tmp/build/ && rm -rf /tmp/build/.git /tmp/build/.github
+          git config user.name "deploy-bot"
+          git config user.email "deploy-bot@users.noreply.github.com"
+          git fetch -q origin gh-pages
+          git checkout -q -B gh-pages origin/gh-pages
+          rm -rf preview && mkdir preview && cp -r /tmp/build/. preview/
+          git add -A preview
+          git commit -q -m "Черновик ${GITHUB_SHA::7}" || exit 0
+          for i in 1 2 3; do git push -q origin gh-pages && exit 0; git pull -q --rebase origin gh-pages; done
+          exit 1
