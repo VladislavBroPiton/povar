@@ -212,8 +212,10 @@ function planShareHTML() { return S.plan && S.plan.days ? '<button class="btn" t
 // ---------- Фото к шагам (если есть для рецепта) ----------
 function stepMediaHTML(r) {
   const m = (window.STEP_MEDIA || {})[r.id];
-  if (!m || !m.length) return '';
-  return `<h3>Как это выглядит</h3><div class="step-media">${m.map(x => `<figure>${x.v ? `<video src="${esc(x.v)}" muted loop playsinline autoplay preload="none" poster="${esc(x.i)}"></video>` : `<img src="${esc(x.i)}" alt="" loading="lazy">`}<figcaption>Шаг ${x.s + 1}</figcaption></figure>`).join('')}</div>`;
+  const v = m && m.find(x => x.v);
+  if (!v) return '';
+  return `<h3>Как это делается</h3><video class="step-video" src="${esc(v.v)}" poster="${esc(m[0].i)}" controls muted playsinline preload="none"></video>
+    <p class="small muted">Фото к шагам и ролик — иллюстрации, созданные ИИ, чтобы было понятно, как должно выглядеть на каждом этапе</p>`;
 }
 
 // ---------- Кнопки и маршруты ----------

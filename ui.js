@@ -601,7 +601,8 @@ function drawRecipe(r) {
   const nut = nutMode === 'serv' ? r.ps : nutMode === 'all' ? r.tot.map(v => v * k) : r.tot.map(v => v / Math.max(r.w, 1) * 100);
   const steps = r.steps.map((s, i) => {
     const t = stepTimers(s, `${r.t}, шаг ${i + 1}`);
-    return `<li data-step="${i}"><div><p>${esc(s)}</p>${t ? `<div class="row tm">${t}</div>` : ''}</div></li>`;
+    const im = stepImg(r.id, i);
+    return `<li data-step="${i}"><div><p>${esc(s)}</p>${im ? `<img class="step-img" src="${esc(im)}" alt="" loading="lazy" decoding="async">` : ''}${t ? `<div class="row tm">${t}</div>` : ''}</div></li>`;
   }).join('');
   const q = r.t;
   const media = [
@@ -670,6 +671,8 @@ function drawRecipe(r) {
   </article>`;
   bindRecipe(r);
 }
+// фото к шагу (ИИ-иллюстрации для популярных рецептов, data/steps.js)
+function stepImg(id, i) { const m = (window.STEP_MEDIA || {})[id]; const x = m && m.find(y => y.s === i); return x ? x.i : ''; }
 function drinksHTML(r) {
   const d = drinks(r, { noAlcohol: S.diets.includes('halal') || S.age > 0 || S.goals.includes('kids') });
   if (!d.soft.length && !d.wine.length) return '';
@@ -792,7 +795,7 @@ function drawCook() {
   el.innerHTML = `<div class="cook-top"><button class="close" id="cookClose" aria-label="Выйти">×</button><div class="cook-title"><b>${esc(r.t)}</b><span>Шаг ${i + 1} из ${n}</span></div><button class="btn sm" id="cookIngs">${ings ? 'Шаги' : 'Продукты'}</button></div>
     <div class="cook-bar"><span style="width:${(i + 1) / n * 100}%"></span></div>
     ${ings ? `<ul class="ings cook-ings">${r.items.map(it => `<li><span class="st basic">•</span><span class="nm"><span>${esc(ING[it.id].n)}</span></span><span class="qty">${esc(qtyText(it, k))}</span></li>`).join('')}</ul>`
-      : `<div class="cook-step"><p>${esc(r.steps[i])}</p><div class="row">${stepTimers(r.steps[i], `${r.t}, шаг ${i + 1}`)}</div>${last && r.tip ? `<div class="tip"><b>Совет.</b> ${esc(r.tip)}</div>` : ''}</div>`}
+      : `<div class="cook-step">${stepImg(r.id, i) ? `<img class="cook-img" src="${esc(stepImg(r.id, i))}" alt="">` : ''}<p>${esc(r.steps[i])}</p><div class="row">${stepTimers(r.steps[i], `${r.t}, шаг ${i + 1}`)}</div>${last && r.tip ? `<div class="tip"><b>Совет.</b> ${esc(r.tip)}</div>` : ''}</div>`}
     <div class="cook-nav"><button class="btn" data-go="-1"${i === 0 ? ' disabled' : ''}>← Назад</button>${last ? '<button class="btn primary" data-go="99">Готово!</button>' : '<button class="btn primary" data-go="1">Дальше →</button>'}</div>`;
 }
 function cookGo(d) {
