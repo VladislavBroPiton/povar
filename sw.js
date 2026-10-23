@@ -1,8 +1,8 @@
 // Офлайн-режим: оболочка и рецепты сохраняются при первом заходе, фото — по мере просмотра
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = [
-  './', 'index.html', 'app.css?v=1', 'app.js?v=1', 'manifest.webmanifest',
-  'data/ingredients.js?v=1', 'data/cities.js?v=1', 'data/recipes.js?v=1', 'data/help.js?v=1',
+  './', 'index.html', 'app.css?v=2', 'config.js?v=2', 'core.js?v=2', 'ui.js?v=2', 'online.js?v=2', 'manifest.webmanifest',
+  'data/ingredients.js?v=2', 'data/cities.js?v=2', 'data/recipes.js?v=2', 'data/help.js?v=2',
   'icons/icon-192.png', 'icons/icon-512.png'
 ];
 
