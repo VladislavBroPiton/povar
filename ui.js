@@ -275,6 +275,16 @@ function dayPartHTML(now = new Date()) {
         : ['Поздно для готовки?', 'впрок на завтра', 'Приготовить на завтра'];
   return `<p class="daypart"><span>${hi}</span><button type="button" data-ex="${q}">${label}<span aria-hidden="true"> →</span></button></p>`;
 }
+// наши страницы в соцсетях: внизу главной и в «Шпаргалках»
+const SOCIAL = [
+  ['https://t.me/kulinar_pomoshchnik', 'Telegram-канал', 'рецепт дня каждое утро'],
+  ['https://t.me/kulinar_pomoshchnik_bot', 'Бот в Telegram', 'подберёт блюдо из ваших продуктов'],
+  ['https://vk.com/club242531804', 'ВКонтакте', 'рецепты и бот в сообщениях'],
+  ['https://ok.ru/group/70000058700764', 'Одноклассники', 'рецепты с БЖУ'],
+];
+function socialHTML() {
+  return `<section class="card social" aria-label="Мы в соцсетях"><h2>Мы в соцсетях</h2><div class="shop-links">${SOCIAL.map(([u, n, note]) => `<a href="${u}" target="_blank" rel="noopener">${n}<span>${note}</span></a>`).join('')}</div></section>`;
+}
 const EXAMPLES = ['ужин из курицы в духовке на 4', 'есть яйца, молоко и мука', 'высокобелковый завтрак', 'суп без мяса', 'на пару для ребёнка 1 год', 'кашерный ужин на 10 гостей', 'грузинская кухня', 'что сделать из вчерашнего риса'];
 let titleWords = [], lastNotice = '', shown = 24;
 function renderFind() {
@@ -346,7 +356,8 @@ function renderFind() {
       <button class="btn sm ghost" type="button" id="resetBtn">Сбросить фильтры</button>
     </aside>
     <section class="results" id="results" aria-live="polite"></section>
-  </div>`;
+  </div>
+  <div class="page social-wrap">${socialHTML()}</div>`;
   bindFind();
   updateResults();
   heroVideo();
@@ -1168,6 +1179,7 @@ function renderHelp() {
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const cur = document.documentElement.dataset.theme || '';
   app.innerHTML = `<div class="page"><h1>Шпаргалки</h1>
+    ${socialHTML()}
     <div class="help-grid">
       <section class="card"><h2>Чем заменить</h2>${table(['Нет', 'Возьмите'], H.swaps)}</section>
       <section class="card"><h2>Сколько варить крупы</h2>${table(['Крупа', 'Воды на 1 стакан', 'Минут', 'Важно'], H.grains)}</section>

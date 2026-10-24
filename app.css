@@ -592,3 +592,7 @@ html.big .btn { min-height: 48px; }
 /* заказ недостающего: уже открытые продукты приглушаются */
 .shop-links a.done { opacity: .5; }
 .shop-links a.done::after { content: ' ✓'; color: var(--accent); }
+
+/* блок «Мы в соцсетях»: на главной на всю ширину под результатами */
+.social-wrap { padding-top: 0; }
+.social .shop-links { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
