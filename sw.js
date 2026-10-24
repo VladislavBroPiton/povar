@@ -1,10 +1,10 @@
 // Офлайн-режим: оболочка и рецепты сохраняются при первом заходе, фото — по мере просмотра. Обновления приходят сами (см. .github/workflows/deploy.yml)
-const VERSION = 'v7';
+const VERSION = '202610240907-ba6d15c';
 // кэш фото не зависит от версии: после обновления сайта картинки не скачиваются заново
 const IMG_CACHE = 'img-cache';
 const SHELL = [
-  './', 'index.html', 'app.css?v=7', 'config.js?v=7', 'core.js?v=7', 'i18n.js?v=7', 'data/i18n-en.js?v=7', 'ui.js?v=7', 'online.js?v=7', 'extra.js?v=7', 'more.js?v=7', 'manifest.webmanifest',
-  'data/ingredients.js?v=7', 'data/cities.js?v=7', 'data/recipes.js?v=7', 'data/help.js?v=7', 'data/steps.js?v=7',
+  './', 'index.html', 'app.css?v=202610240907-ba6d15c', 'config.js?v=202610240907-ba6d15c', 'core.js?v=202610240907-ba6d15c', 'i18n.js?v=202610240907-ba6d15c', 'data/i18n-en.js?v=202610240907-ba6d15c', 'ui.js?v=202610240907-ba6d15c', 'online.js?v=202610240907-ba6d15c', 'extra.js?v=202610240907-ba6d15c', 'more.js?v=202610240907-ba6d15c', 'manifest.webmanifest',
+  'data/ingredients.js?v=202610240907-ba6d15c', 'data/cities.js?v=202610240907-ba6d15c', 'data/recipes.js?v=202610240907-ba6d15c', 'data/help.js?v=202610240907-ba6d15c', 'data/steps.js?v=202610240907-ba6d15c',
   'icons/icon-192.png', 'icons/icon-512.png'
 ];
 
