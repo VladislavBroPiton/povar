@@ -27,8 +27,33 @@ function save() {
 buildRecipes(S.own);
 
 // Статистика (заработает, когда подключим сервер)
+// откуда пришёл человек, с какого устройства, впервые ли — для недельного отчёта (без личных данных)
+function visitMeta() {
+  const p = new URLSearchParams(location.search);
+  let src = p.get('utm_source') || '';
+  if (!src) {
+    let host = '';
+    try { host = document.referrer ? new URL(document.referrer).hostname : ''; } catch { /* ничего */ }
+    if (/tgWebApp/.test(location.hash) || (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData)) src = 'telegram_app';
+    else if (!host || host === location.hostname) src = 'direct';
+    else if (/yandex\.|google\.|bing\.|duckduckgo|mail\.ru|rambler/.test(host)) src = 'search';
+    else if (/(^|\.)vk\.(com|ru)$|vkontakte/.test(host)) src = 'vk';
+    else if (/(^|\.)ok\.ru$/.test(host)) src = 'ok';
+    else if (/t\.me$|telegram/.test(host)) src = 'telegram';
+    else if (/pinterest/.test(host)) src = 'pinterest';
+    else src = 'other:' + host.slice(0, 30);
+  }
+  const coarse = matchMedia('(pointer: coarse)').matches, small = Math.min(screen.width, screen.height);
+  let nw = '0';
+  try { if (!localStorage.getItem('cook.seen')) { nw = '1'; localStorage.setItem('cook.seen', '1'); } } catch { /* ничего */ }
+  let lang = 'ru';
+  try { lang = localStorage.getItem('cook.lang') || (document.documentElement.lang || 'ru').slice(0, 2); } catch { /* ничего */ }
+  return { src, dev: coarse ? (small < 600 ? 'phone' : 'tablet') : 'desktop', lang, nw, pwa: matchMedia('(display-mode: standalone)').matches || navigator.standalone ? '1' : '0' };
+}
 function track(ev, data) {
   if (!window.API_BASE) return;
+  // проверки сайта роботом (перед публикацией и мои) в статистику не попадают
+  try { if (navigator.webdriver || localStorage.getItem('cook.notrack')) return; } catch { /* ничего */ }
   try { navigator.sendBeacon(window.API_BASE + '/api/hit', JSON.stringify({ ev, ...data, city: S.city && S.city.n })); } catch { /* не важно */ }
 }
 
@@ -806,7 +831,7 @@ function bindRecipe(r) {
     if (b.dataset.star) { const n = +b.dataset.star; setNote(r.id, { s: (S.notes[r.id] || {}).s === n ? 0 : n }); $$('[data-star]', root).forEach(x => x.classList.toggle('on', (S.notes[r.id].s || 0) >= +x.dataset.star)); return; }
     if (b.matches('li[data-step]')) { b.classList.toggle('done'); return; }
     if (b.id === 'cookBtn') { openCook(r); return; }
-    if (b.id === 'cookedBtn') { const c = ((S.notes[r.id] || {}).c || 0) + 1; setNote(r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', r, curServ / r.serv * panK); b.textContent = `Я приготовил · ${c} ${plural(c, 'раз', 'раза', 'раз')}`; toast('Отметил. Приятного аппетита!'); return; }
+    if (b.id === 'cookedBtn') { track('cooked', { id: r.id }); const c = ((S.notes[r.id] || {}).c || 0) + 1; setNote(r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', r, curServ / r.serv * panK); b.textContent = `Я приготовил · ${c} ${plural(c, 'раз', 'раза', 'раз')}`; toast('Отметил. Приятного аппетита!'); return; }
     if (b.id === 'favBtn') { S.fav = S.fav.includes(r.id) ? S.fav.filter(x => x !== r.id) : [...S.fav, r.id]; save(); const on = S.fav.includes(r.id); b.classList.toggle('on-fav', on); b.innerHTML = on ? IC.heartOn + 'В избранном' : IC.heart + 'В избранное'; if (on) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300 }); return; }
     if (b.id === 'printBtn') { print(); return; }
     if (b.id === 'shareBtn') {
@@ -815,6 +840,7 @@ function bindRecipe(r) {
       return;
     }
     if (b.id === 'toList') {
+      track('list', { id: r.id });
       const k = curServ / r.serv * panK, H = haveSet(S);
       const items = r.items.filter(it => !it.opt && itemStatus(it.id, H).s === 'miss').map(it => ({ id: it.id, g: it.g * k }));
       const n = addItemsToList(items, r.t);
@@ -857,6 +883,7 @@ async function loadGallery(r) {
 // ---------- Режим готовки: шаги на весь экран ----------
 let cookState = null;
 function openCook(r) {
+  track('cook', { id: r.id });
   const k = curServ / r.serv * panK;
   const el = document.createElement('div');
   el.className = 'cook'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Готовим: ' + r.t);
@@ -890,7 +917,7 @@ function drawCook() {
 }
 function cookGo(d) {
   if (!cookState) return;
-  if (d === 99) { const c = ((S.notes[cookState.r.id] || {}).c || 0) + 1; setNote(cookState.r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', cookState.r, cookState.k); closeCook(); toast('Готово! Отметил в заметках к рецепту'); return; }
+  if (d === 99) { track('cooked', { id: cookState.r.id }); const c = ((S.notes[cookState.r.id] || {}).c || 0) + 1; setNote(cookState.r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', cookState.r, cookState.k); closeCook(); toast('Готово! Отметил в заметках к рецепту'); return; }
   cookState.i = Math.max(0, Math.min(cookState.r.steps.length - 1, cookState.i + d));
   cookState.ings = false;
   drawCook();
@@ -914,6 +941,7 @@ document.addEventListener('keydown', e => {
 const timers = [];
 let audioCtx = null, tickId = 0;
 function startTimer(min, label, rid) {
+  track('timer', { id: rid || '' });
   try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); } catch { /* без звука */ }
   timers.push({ id: Date.now() + Math.random(), label, rid, min, end: Date.now() + min * 60000, ring: false });
   hook('timerStarted');
@@ -1237,7 +1265,7 @@ async function doInstall() {
   deferredInstall = null; $('#installBtn').hidden = true;
 }
 $('#installBtn').addEventListener('click', doInstall);
-window.addEventListener('appinstalled', () => { $('#installBtn').hidden = true; toast('Приложение установлено'); });
+window.addEventListener('appinstalled', () => { track('install'); $('#installBtn').hidden = true; toast('Приложение установлено'); });
 
 // ---------- Telegram Mini App ----------
 let TG = null;
@@ -1324,7 +1352,7 @@ function boot() {
   updateBadge();
   route();
   initCity();
-  track('open', { path: location.hash });
+  track('open', { path: location.hash, ...visitMeta() });
 }
 // ---------- Автообновление ----------
 // После публикации у сайта новая версия (её ставит GitHub при заливке). Сайт сам это замечает
