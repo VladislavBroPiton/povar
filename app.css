@@ -586,7 +586,7 @@ html.big .btn { min-height: 48px; }
   .steps li::before { width: 20px; height: 20px; font-size: 9pt; }
   .steps .tm { display: none; }
   .tip, .drinks { padding: 6px 10px; break-inside: avoid; }
-  .r-head::after { content: "Что приготовить · vladislavbropiton.github.io/povar"; font-size: 8pt; color: var(--muted); }
+  .r-head::after { content: "Что приготовить · chto-prigotovit-doma.ru"; font-size: 8pt; color: var(--muted); }
 }
 
 /* заказ недостающего: уже открытые продукты приглушаются */

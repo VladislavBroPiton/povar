@@ -20,7 +20,7 @@ jobs:
         run: |
           mkdir -p lh
           for p in "home|" "recipe|r/sharlotka.html" "list|q/iz-kuricy.html"; do
-            n="${p%%|*}"; u="https://vladislavbropiton.github.io/povar/${p#*|}"
+            n="${p%%|*}"; u="https://chto-prigotovit-doma.ru/${p#*|}"
             npx -y lighthouse@12.2.1 "$u" --quiet --chrome-flags="--headless=new --no-sandbox" \
               --only-categories=performance,accessibility,best-practices,seo \
               --output=json --output=html --output-path="lh/$n" || true

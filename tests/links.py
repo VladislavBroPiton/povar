@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = sys.argv[1] if len(sys.argv) > 1 else 'https://vladislavbropiton.github.io/povar/'
+SITE = sys.argv[1] if len(sys.argv) > 1 else 'https://chto-prigotovit-doma.ru/'
 UA = {'User-Agent': 'Mozilla/5.0 (link check; povar)'}
 SKIP = re.compile(r'localhost|onrender\.com|example\.|fonts\.g|schema\.org|sitemaps\.org|w3\.org|t\.me/share|\{|w/api\.php')
 
@@ -34,7 +34,7 @@ def status(url):
 def main():
     sitemap = (ROOT / 'sitemap.xml').read_text(encoding='utf-8')
     pages = re.findall(r'<loc>([^<]+)</loc>', sitemap)
-    pages = [SITE + p.split('/povar/', 1)[1] if '/povar/' in p else p for p in pages]
+    pages = [SITE + p.split('.ru/', 1)[1] if 'chto-prigotovit-doma.ru/' in p else p for p in pages]
     ext = set()
     for f in [ROOT / 'index.html', *ROOT.glob('data/*.js'), *ROOT.glob('*.js')]:
         if f.name == 'i18n-en.js':
@@ -43,7 +43,7 @@ def main():
             u = u.rstrip('.,;')
             while u.endswith(')') and u.count(')') > u.count('('):
                 u = u[:-1]
-            if not SKIP.search(u) and 'vladislavbropiton.github.io' not in u:
+            if not SKIP.search(u) and 'chto-prigotovit-doma.ru' not in u and 'vladislavbropiton.github.io' not in u:
                 ext.add(u)
     urls = sorted(set(pages)) + sorted(ext)
     with cf.ThreadPoolExecutor(12) as pool:
