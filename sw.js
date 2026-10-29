@@ -1,7 +1,8 @@
 // Офлайн-режим: оболочка и рецепты сохраняются при первом заходе, фото — по мере просмотра. Обновления приходят сами (см. .github/workflows/deploy.yml)
 const VERSION = 'v7';
-// кэш фото не зависит от версии: после обновления сайта картинки не скачиваются заново
-const IMG_CACHE = 'img-cache';
+// кэш фото не зависит от версии: после обновления сайта картинки не скачиваются заново.
+// img-cache-2: старый кэш фото удаляется — в нём застряло прежнее фото бутербродов с авокадо
+const IMG_CACHE = 'img-cache-2';
 const SHELL = [
   './', 'index.html', 'app.css?v=7', 'config.js?v=7', 'core.js?v=7', 'i18n.js?v=7', 'data/i18n-en.js?v=7', 'ui.js?v=7', 'online.js?v=7', 'extra.js?v=7', 'more.js?v=7', 'manifest.webmanifest',
   'data/ingredients.js?v=7', 'data/cities.js?v=7', 'data/recipes.js?v=7', 'data/help.js?v=7', 'data/steps.js?v=7',
@@ -23,14 +24,19 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
   // видео грузится кусками (ответ 206) — его не кэширую
   if (url.pathname.includes('/media/')) return;
-  // фото: из кэша, если есть
+  // фото: сразу из кэша, а в фоне сверяюсь с сайтом — заменённое фото покажется со следующего захода
   if (url.pathname.includes('/img/')) {
     e.respondWith(caches.open(IMG_CACHE).then(async c => {
       const hit = await c.match(e.request);
-      if (hit) return hit;
-      const res = await fetch(e.request);
-      if (res.ok) c.put(e.request, res.clone());
-      return res;
+      const update = fetch(e.request, { cache: 'no-cache' }).then(res => {
+        if (res.ok) c.put(e.request, res.clone());
+        return res;
+      });
+      if (hit) {
+        e.waitUntil(update.catch(() => {}));
+        return hit;
+      }
+      return update;
     }));
     return;
   }
