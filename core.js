@@ -559,13 +559,16 @@ function fmtGrams(g, liquid) {
 function qtyText(it, k) {
   const ing = ING[it.id];
   if (it.u === 'по вкусу') return 'по вкусу';
-  if (it.u && it.u !== 'г' && it.u !== 'мл' && it.q) return fmtQty(it.q * k) + ' ' + it.u;
+  if (it.u && it.u !== 'г' && it.u !== 'мл' && it.q) { const v = fmtQty(it.q * k); return v + ' ' + unitWord(it.u, v); }
   if (ing.pc && (!it.u || it.u === 'г') && ing.cat !== 'spice') {
     const n = it.g * k / ing.pc;
     if (n >= 0.5 && n <= 20) return fmtQty(n) + ' шт';
   }
   return fmtGrams(it.g * k, ing.fl.includes('l'));
 }
+// единица после числа: «3 пучка», «½ пучка», «5 пучков» (было «3 пучок»)
+const UNIT_FORMS = {'пучок': ['пучок', 'пучка', 'пучков'], 'банка': ['банка', 'банки', 'банок'], 'головка': ['головка', 'головки', 'головок'], 'долька': ['долька', 'дольки', 'долек'], 'лист': ['лист', 'листа', 'листов'], 'ломтик': ['ломтик', 'ломтика', 'ломтиков'], 'кочан': ['кочан', 'кочана', 'кочанов'], 'стебель': ['стебель', 'стебля', 'стеблей'], 'тушка': ['тушка', 'тушки', 'тушек'], 'пакетик': ['пакетик', 'пакетика', 'пакетиков'], 'желток': ['желток', 'желтка', 'желтков']};
+function unitWord(u, shown) { const f = UNIT_FORMS[u]; if (!f) return u; return /^\d+$/.test(shown) ? plural(+shown, f[0], f[1], f[2]) : f[1]; }
 function plural(n, a, b, c) { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; }
 
 if (typeof module !== 'undefined') {
