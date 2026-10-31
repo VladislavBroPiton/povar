@@ -1,11 +1,11 @@
 // Офлайн-режим: оболочка и рецепты сохраняются при первом заходе, фото — по мере просмотра. Обновления приходят сами (см. .github/workflows/deploy.yml)
-const VERSION = 'v7';
+const VERSION = '202610311521-597d92d';
 // кэш фото не зависит от версии: после обновления сайта картинки не скачиваются заново.
 // img-cache-2: старый кэш фото удаляется — в нём застряло прежнее фото бутербродов с авокадо
 const IMG_CACHE = 'img-cache-2';
 const SHELL = [
-  './', 'index.html', 'app.css?v=7', 'config.js?v=7', 'core.js?v=7', 'i18n.js?v=7', 'data/i18n-en.js?v=7', 'ui.js?v=7', 'online.js?v=7', 'extra.js?v=7', 'more.js?v=7', 'manifest.webmanifest',
-  'data/ingredients.js?v=7', 'data/cities.js?v=7', 'data/recipes.js?v=7', 'data/help.js?v=7', 'data/steps.js?v=7',
+  './', 'index.html', 'app.css?v=202610311521-597d92d', 'config.js?v=202610311521-597d92d', 'core.js?v=202610311521-597d92d', 'i18n.js?v=202610311521-597d92d', 'data/i18n-en.js?v=202610311521-597d92d', 'ui.js?v=202610311521-597d92d', 'online.js?v=202610311521-597d92d', 'extra.js?v=202610311521-597d92d', 'more.js?v=202610311521-597d92d', 'manifest.webmanifest',
+  'data/ingredients.js?v=202610311521-597d92d', 'data/cities.js?v=202610311521-597d92d', 'data/recipes.js?v=202610311521-597d92d', 'data/help.js?v=202610311521-597d92d', 'data/steps.js?v=202610311521-597d92d',
   'icons/icon-192.png', 'icons/icon-512.png'
 ];
 
