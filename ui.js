@@ -309,7 +309,7 @@ const SOCIAL = [
   ['https://ok.ru/group/70000058700764', 'Одноклассники', 'рецепты с БЖУ'],
 ];
 function socialHTML() {
-  return `<section class="card social" aria-label="Мы в соцсетях"><h2>Мы в соцсетях</h2><div class="shop-links">${SOCIAL.map(([u, n, note]) => `<a href="${u}" target="_blank" rel="noopener">${n}<span>${note}</span></a>`).join('')}</div></section>`;
+  return `<section class="card social" aria-label="Мы в соцсетях"><h2>Мы в соцсетях</h2><div class="shop-links">${SOCIAL.map(([u, n, note]) => `<a href="${u}" target="_blank" rel="noopener">${n}<span>${note}</span></a>`).join('')}</div><p class="small muted"><a href="privacy.html">Политика конфиденциальности</a></p></section>`;
 }
 const EXAMPLES = ['ужин из курицы в духовке на 4', 'есть яйца, молоко и мука', 'высокобелковый завтрак', 'суп без мяса', 'на пару для ребёнка 1 год', 'кашерный ужин на 10 гостей', 'грузинская кухня', 'что сделать из вчерашнего риса'];
 let titleWords = [], lastNotice = '', shown = 24;
@@ -1397,6 +1397,17 @@ if ('serviceWorker' in navigator) {
   const hadController = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) { updateReady = true; applyUpdate(); } });
 }
+
+// плашка про cookies и Метрику: один раз, до «Понятно» (политика: privacy.html)
+function cookieNote() {
+  try { if (localStorage.getItem('cook.cookieOk')) return; } catch { return; }
+  const el = document.createElement('div');
+  el.className = 'cookie-note'; el.setAttribute('role', 'region'); el.setAttribute('aria-label', 'Cookies');
+  el.innerHTML = '<span>Сайт использует cookies и Яндекс Метрику, чтобы понимать, что улучшить. <a href="privacy.html">Подробнее</a></span><button class="btn sm" type="button">Понятно</button>';
+  el.querySelector('button').addEventListener('click', () => { try { localStorage.setItem('cook.cookieOk', '1'); } catch { /* ничего */ } el.remove(); });
+  document.body.appendChild(el);
+}
+setTimeout(cookieNote, 1500);
 
 // запуск откладываю до конца загрузки всех скриптов (online.js встраивает свои функции)
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else setTimeout(boot, 0);

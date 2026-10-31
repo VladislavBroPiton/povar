@@ -105,6 +105,14 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .city-confirm[hidden], .city-confirm.away { display: none; }
 @keyframes city-in { from { transform: translateY(16px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .city-confirm { animation: none; } }
+.cookie-note {
+  /* про cookies: над нижним меню, ниже всплывающего выбора города */
+  position: fixed; z-index: 34; left: 12px; right: 12px; bottom: calc(var(--tabs-h) + env(safe-area-inset-bottom) + 10px);
+  padding: 10px 12px 10px 16px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 8px 28px rgba(40, 24, 12, .14); font-size: var(--fs-s);
+  display: flex; gap: 12px; align-items: center; justify-content: space-between;
+}
+@media (min-width: 1000px) { .cookie-note { left: 20px; right: auto; bottom: 20px; max-width: 460px; } }
 @media (min-width: 1000px) { .city-confirm { left: auto; right: 20px; bottom: 20px; max-width: 420px; } }
 @media (orientation: landscape) and (max-height: 520px) { .city-confirm { left: auto; right: 12px; bottom: 10px; max-width: 420px; } }
 .city-confirm p { font-weight: 600; }
