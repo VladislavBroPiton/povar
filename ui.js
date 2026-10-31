@@ -1403,7 +1403,7 @@ function cookieNote() {
   try { if (localStorage.getItem('cook.cookieOk')) return; } catch { return; }
   const el = document.createElement('div');
   el.className = 'cookie-note'; el.setAttribute('role', 'region'); el.setAttribute('aria-label', 'Cookies');
-  el.innerHTML = '<span>Сайт использует <a href="privacy.html">куки</a></span><button type="button">Ок</button>';
+  el.innerHTML = '<span>Сайт использует <a href="privacy.html">cookie</a></span><button type="button">Ок</button>';
   el.querySelector('button').addEventListener('click', () => { try { localStorage.setItem('cook.cookieOk', '1'); } catch { /* ничего */ } el.remove(); });
   document.body.appendChild(el);
 }
