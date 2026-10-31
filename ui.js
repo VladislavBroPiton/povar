@@ -14,8 +14,9 @@ const hook = (name, ...args) => typeof window[name] === 'function' ? window[name
 // ---------- Состояние ----------
 const KEY = 'cook.v1';
 const DEF = {
-  city: null, have: [], want: [], ex: [], meal: [], kind: [], goals: [], methods: [], diets: [], cuisine: [], occ: '', age: 0,
-  serv: 0, time: 0, lvl: 0, sort: 'match', view: 'grid', fav: [], list: [], q: '', dates: {}, notes: {}, own: [], plan: null,
+  city: null, have: [], want: [], ex: [], meal: ['dinner'], kind: [], goals: [], methods: [], diets: [], cuisine: [], occ: '', age: 0,
+  // meal: ужин и time: 30 — ниша «ужин за 30 минут»: новым посетителям сразу быстрые ужины
+  serv: 0, time: 30, lvl: 0, sort: 'match', view: 'grid', fav: [], list: [], q: '', dates: {}, notes: {}, own: [], plan: null,
   planOpt: { days: 7, people: 2, meals: ['breakfast', 'lunch', 'dinner'], goal: '', budget: false }
 };
 let S;
@@ -223,7 +224,7 @@ function card(row, H) {
     <div class="ph"><span class="fallback" aria-hidden="true">${KIND_ICON[r.kind] || '🍽️'}</span>${photo(r, true)}${pill}</div>
     <div class="body">
       <h3>${esc(r.t)}</h3>
-      <div class="meta"><span>${r.time} мин</span><span>${Math.round(r.ps[0])} ккал</span><span>Б ${Math.round(r.ps[1])} · Ж ${Math.round(r.ps[2])} · У ${Math.round(r.ps[3])}</span>${priceOn() && r.cost ? `<span>≈ ${fmtRub(r.cost * coef())} / порция</span>` : ''}${st ? `<span class="stars">${st}</span>` : ''}</div>
+      <div class="meta"><span>⏱ ${r.time} мин</span><span>${Math.round(r.ps[0])} ккал</span><span>Б ${Math.round(r.ps[1])} · Ж ${Math.round(r.ps[2])} · У ${Math.round(r.ps[3])}</span>${priceOn() && r.cost ? `<span>≈ ${fmtRub(r.cost * coef())} / порция</span>` : ''}${st ? `<span class="stars">${st}</span>` : ''}</div>
       ${algHTML(r)}
       ${need}
     </div></a>`;
@@ -322,8 +323,8 @@ function renderFind() {
     <section class="hero" aria-label="Что приготовить">
       <div class="hero-text">
         ${dayPartHTML()}
-        <h1>Что приготовить?</h1>
-        <p class="lead">Напишите или скажите, что есть дома и чего хочется. Подберу рецепт под ваш город, цель и число гостей</p>
+        <h1>Ужин за 30 минут из того, что есть</h1>
+        <p class="lead">Напишите или скажите, что есть в холодильнике. Подберу быстрые блюда под ваш город, цель и число гостей</p>
         <form class="ask-row" id="askForm">
           <input class="input" id="askQ" value="${esc(S.q)}" placeholder="Например: ужин из курицы и картошки на 6" enterkeyhint="search" autocomplete="off" aria-label="Опишите, что хотите приготовить">
           ${SR ? '<button class="btn mic" type="button" id="micBtn" aria-label="Сказать голосом"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>' : ''}
@@ -460,7 +461,13 @@ function updateResults(more) {
   shown = more ? shown + 24 : 24;
   summaries();
   const ES = typeof effS === 'function' ? effS() : S;
-  const { rows, H, exp } = compute(ES, { titleWords });
+  let { rows, H, exp } = compute(ES, { titleWords });
+  // до N минут ничего нет (например, «борщ») — показываю блюда подольше, а не пустой экран
+  let relaxed = false;
+  if (!rows.length && ES.time) {
+    const alt = compute({ ...ES, time: 0 }, { titleWords });
+    if (alt.rows.length) ({ rows, H, exp } = alt), relaxed = true;
+  }
   const box = $('#results');
   const any = S.have.length || S.want.length || S.ex.length || S.meal.length || S.kind.length || S.goals.length || S.methods.length || S.diets.length || S.cuisine.length || S.occ || S.age || S.time || S.lvl || titleWords.length;
   let h = `<div class="results-head"><h2>${rows.length ? `Нашёл ${rows.length} ${plural(rows.length, 'рецепт', 'рецепта', 'рецептов')}` : 'Ничего не нашлось'}</h2>
@@ -472,6 +479,7 @@ function updateResults(more) {
   if (S.occ && COLLS[S.occ].note) h += `<div class="notice">${esc(COLLS[S.occ].n)}: ${esc(COLLS[S.occ].note)}</div>`;
   if (exp.length) h += `<div class="notice warn">Скоро испортится: ${esc(exp.map(x => tokenName(x.t).toLowerCase() + ' (' + (x.days < 0 ? 'срок вышел' : x.days === 0 ? 'сегодня' : x.days === 1 ? 'завтра' : 'через ' + x.days + ' дня') + ')').join(', '))}. Блюда с ними — первыми</div>`;
   if (lastNotice) h += `<div class="notice">${lastNotice}</div>`;
+  if (relaxed) h += `<div class="notice">До ${S.time} минут под запрос ничего нет — показываю блюда, которые готовятся дольше</div>`;
   const om = oneMore(ES);
   h += hook('profileNoticeHTML');
   if (om) h += `<div class="notice ok one-more"><span>Купите только <b>${esc(ING[om.id].n.toLowerCase())}</b> — и откроются ещё ${om.n} ${plural(om.n, 'блюдо', 'блюда', 'блюд')}</span>
