@@ -16,20 +16,30 @@
 /* кнопка «в приложение» висит внизу экрана на подложке цвета страницы: текст уходит под неё плавно, а не режется */
 .cta{display:block;text-align:center}
 .ctabar{position:sticky;bottom:0;margin:-8px -16px 0;padding:28px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,var(--bg) 26px);transition:opacity .2s}
-.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}</style>
+.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}
+.st-top,.st-cols,.st-head{display:grid;gap:16px;align-content:start}.st-photo{margin:0;display:grid;gap:6px}.st ol li{line-height:1.55}
+/* компьютер: фото и описание рядом, ниже продукты слева (не уезжают при прокрутке) и шаги справа — как в приложении */
+@media (min-width:1000px){.st{max-width:1180px;padding:24px}.st-top{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
+.st-cols{grid-template-columns:380px minmax(0,1fr);align-items:start}.st-ing{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.ctabar{max-width:520px;margin:-8px auto 0;width:100%}}</style>
 <script src="../metrika.js?v=7" async></script>
 </head><body>
 <header class="top" style="margin:0"><a class="logo" href="../"><img src="../icons/icon-192.png" alt="" width="32" height="32"><span>Что приготовить</span></a></header>
 <main class="st">
   <nav class="small muted" aria-label="Навигация"><a href="../">Что приготовить</a> → <a href="./">Все рецепты</a> → Булгур с фаршем по-турецки</nav>
-  <img src="../img/bulgur-s-farshem-po-turetski.webp" alt="Булгур с фаршем по-турецки">
-  <p class="small muted">Фото: <a href="https://developers.cloudflare.com/workers-ai/" rel="noopener">Иллюстрация ИИ</a>, Cloudflare Workers AI</p>
+  <div class="st-top">
+  <figure class="st-photo"><img src="../img/bulgur-s-farshem-po-turetski.webp" alt="Булгур с фаршем по-турецки">
+  <figcaption class="small muted">Фото: <a href="https://developers.cloudflare.com/workers-ai/" rel="noopener">Иллюстрация ИИ</a>, Cloudflare Workers AI</figcaption></figure>
+  <div class="st-head">
   <h1>Булгур с фаршем по-турецки</h1>
   <p class="lead">Рассыпчатый булгур с говяжьим фаршем, перцем и томатной пастой</p>
   <div class="facts"><span class="fact">30 мин</span><span class="fact">4 порц.</span><span class="fact">530 ккал на порцию</span><span class="fact">Б 23 · Ж 24 · У 46</span><span class="fact">Средиземноморская кухня</span></div>
   <a class="btn primary cta" id="cta1" href="../#/r/bulgur-s-farshem-po-turetski">Открыть в приложении: порции, таймеры, список покупок</a>
-  <section class="card"><h2>Продукты на 4 порц.</h2><ul><li><span>Булгур</span><b>1,5 стак.</b></li><li><span>Говяжий фарш</span><b>300 г</b></li><li><span>Лук репчатый</span><b>1 шт</b></li><li><span>Перец болгарский</span><b>1 шт</b></li><li><span>Томатная паста</span><b>1 ст. л.</b></li><li><span>Сливочное масло</span><b>20 г</b></li><li><span>Растительное масло</span><b>1 ст. л.</b></li><li><span>Зира</span><b>0,5 ч. л.</b></li><li><span>Острый перец молотый</span><b>2 щеп.</b></li><li><span>Вода</span><b>2,75 стак.</b></li><li><span>Соль</span><b>2 ч. л.</b></li></ul></section>
+  </div></div>
+  <div class="st-cols">
+  <section class="card st-ing"><h2>Продукты на 4 порц.</h2><ul><li><span>Булгур</span><b>1,5 стак.</b></li><li><span>Говяжий фарш</span><b>300 г</b></li><li><span>Лук репчатый</span><b>1 шт</b></li><li><span>Перец болгарский</span><b>1 шт</b></li><li><span>Томатная паста</span><b>1 ст. л.</b></li><li><span>Сливочное масло</span><b>20 г</b></li><li><span>Растительное масло</span><b>1 ст. л.</b></li><li><span>Зира</span><b>0,5 ч. л.</b></li><li><span>Острый перец молотый</span><b>2 щеп.</b></li><li><span>Вода</span><b>2,75 стак.</b></li><li><span>Соль</span><b>2 ч. л.</b></li></ul></section>
   <section class="card"><h2>Как готовить</h2><ol><li>Мелко нарежьте лук, перец кубиками.</li><li>Разогрейте масло в сковороде на сильном огне и обжарьте фарш 5 минут, разбивая комочки, пока он не станет рассыпчатым.</li><li>Добавьте лук и перец и жарьте на среднем огне 4 минуты. Добавьте томатную пасту, зиру и острый перец, перемешайте 1 минуту.</li><li>Добавьте сливочное масло и булгур, перемешайте 1 минуту, чтобы крупа пропиталась маслом.</li><li>Влейте горячую воду, посолите, доведите до кипения, накройте крышкой и готовьте на слабом огне 15 минут, пока вода не впитается.</li><li>Снимите с огня, накройте полотенцем на 5 минут и перемешайте вилкой.</li></ol><div class="tip"><b>Совет.</b> Пропорция для булгура в сковороде: 1 часть крупы на 2 части воды. Больше воды, и он разварится.</div></section>
+  </div>
   <div class="ctabar off" id="ctabar"><a class="btn primary cta" href="../#/r/bulgur-s-farshem-po-turetski">Открыть в приложении: порции, таймеры, список покупок</a></div>
   <script>(function(){var a=document.getElementById('cta1'),b=document.getElementById('ctabar');function f(){b.classList.toggle('off',a.getBoundingClientRect().bottom>0)}addEventListener('scroll',f,{passive:true});f()})()</script>
   <p class="small muted"><a href="./">Все рецепты</a></p>

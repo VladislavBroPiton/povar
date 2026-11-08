@@ -16,20 +16,30 @@
 /* кнопка «в приложение» висит внизу экрана на подложке цвета страницы: текст уходит под неё плавно, а не режется */
 .cta{display:block;text-align:center}
 .ctabar{position:sticky;bottom:0;margin:-8px -16px 0;padding:28px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,var(--bg) 26px);transition:opacity .2s}
-.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}</style>
+.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}
+.st-top,.st-cols,.st-head{display:grid;gap:16px;align-content:start}.st-photo{margin:0;display:grid;gap:6px}.st ol li{line-height:1.55}
+/* компьютер: фото и описание рядом, ниже продукты слева (не уезжают при прокрутке) и шаги справа — как в приложении */
+@media (min-width:1000px){.st{max-width:1180px;padding:24px}.st-top{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
+.st-cols{grid-template-columns:380px minmax(0,1fr);align-items:start}.st-ing{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.ctabar{max-width:520px;margin:-8px auto 0;width:100%}}</style>
 <script src="../metrika.js?v=7" async></script>
 </head><body>
 <header class="top" style="margin:0"><a class="logo" href="../"><img src="../icons/icon-192.png" alt="" width="32" height="32"><span>Что приготовить</span></a></header>
 <main class="st">
   <nav class="small muted" aria-label="Навигация"><a href="../">Что приготовить</a> → <a href="./">Все рецепты</a> → Сочная куриная грудка на сковороде</nav>
-  <img src="../img/kurinaya-grudka-na-skovorode.webp" alt="Сочная куриная грудка на сковороде">
-  <p class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Grilled_Chicken_Breasts_(28905381261).jpg" rel="noopener">Sharon Chen from Austin, United States</a>, CC BY 2.0</p>
+  <div class="st-top">
+  <figure class="st-photo"><img src="../img/kurinaya-grudka-na-skovorode.webp" alt="Сочная куриная грудка на сковороде">
+  <figcaption class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Grilled_Chicken_Breasts_(28905381261).jpg" rel="noopener">Sharon Chen from Austin, United States</a>, CC BY 2.0</figcaption></figure>
+  <div class="st-head">
   <h1>Сочная куриная грудка на сковороде</h1>
   <p class="lead">Филе за 10 минут жарки, которое не получается сухим</p>
   <div class="facts"><span class="fact">25 мин</span><span class="fact">3 порц.</span><span class="fact">275 ккал на порцию</span><span class="fact">Б 47 · Ж 9 · У 1</span><span class="fact">Интернациональная кухня</span></div>
   <a class="btn primary cta" id="cta1" href="../#/r/kurinaya-grudka-na-skovorode">Открыть в приложении: порции, таймеры, список покупок</a>
-  <section class="card"><h2>Продукты на 3 порц.</h2><ul><li><span>Куриное филе</span><b>2 шт</b></li><li><span>Растительное масло</span><b>1 ст. л.</b></li><li><span>Соль</span><b>1 ч. л.</b></li><li><span>Перец чёрный молотый</span><b>1 щеп.</b></li><li><span>Паприка</span><b>0,5 ч. л.</b></li><li><span>Чеснок <small>по желанию</small></span><b>1 зуб.</b></li></ul></section>
+  </div></div>
+  <div class="st-cols">
+  <section class="card st-ing"><h2>Продукты на 3 порц.</h2><ul><li><span>Куриное филе</span><b>2 шт</b></li><li><span>Растительное масло</span><b>1 ст. л.</b></li><li><span>Соль</span><b>1 ч. л.</b></li><li><span>Перец чёрный молотый</span><b>1 щеп.</b></li><li><span>Паприка</span><b>0,5 ч. л.</b></li><li><span>Чеснок <small>по желанию</small></span><b>1 зуб.</b></li></ul></section>
   <section class="card"><h2>Как готовить</h2><ol><li>Каждое филе разрежьте вдоль пополам на две тонкие пластины или отбейте через плёнку до толщины 1,5 см.</li><li>Посолите, поперчите и посыпьте паприкой с двух сторон. Оставьте на 10 минут при комнатной температуре.</li><li>Разогрейте сковороду с маслом на сильном огне, пока масло не начнёт слегка дымить.</li><li>Выложите филе и жарьте 3-4 минуты, не двигая, до золотистой корочки.</li><li>Переверните, убавьте огонь до среднего, добавьте раздавленный чеснок и жарьте ещё 3-4 минуты.</li><li>Надрежьте самый толстый кусок: внутри мясо белое, сок прозрачный. Снимите на тарелку и дайте полежать 3 минуты перед нарезкой.</li></ol><div class="tip"><b>Совет.</b> Главная причина сухой грудки - неровная толщина: тонкий край пересыхает, пока дожаривается толстый. Поэтому филе обязательно разрезают или отбивают.</div></section>
+  </div>
   <div class="ctabar off" id="ctabar"><a class="btn primary cta" href="../#/r/kurinaya-grudka-na-skovorode">Открыть в приложении: порции, таймеры, список покупок</a></div>
   <script>(function(){var a=document.getElementById('cta1'),b=document.getElementById('ctabar');function f(){b.classList.toggle('off',a.getBoundingClientRect().bottom>0)}addEventListener('scroll',f,{passive:true});f()})()</script>
   <p class="small muted"><a href="./">Все рецепты</a></p>

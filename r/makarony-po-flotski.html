@@ -16,20 +16,30 @@
 /* кнопка «в приложение» висит внизу экрана на подложке цвета страницы: текст уходит под неё плавно, а не режется */
 .cta{display:block;text-align:center}
 .ctabar{position:sticky;bottom:0;margin:-8px -16px 0;padding:28px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,var(--bg) 26px);transition:opacity .2s}
-.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}</style>
+.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}
+.st-top,.st-cols,.st-head{display:grid;gap:16px;align-content:start}.st-photo{margin:0;display:grid;gap:6px}.st ol li{line-height:1.55}
+/* компьютер: фото и описание рядом, ниже продукты слева (не уезжают при прокрутке) и шаги справа — как в приложении */
+@media (min-width:1000px){.st{max-width:1180px;padding:24px}.st-top{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
+.st-cols{grid-template-columns:380px minmax(0,1fr);align-items:start}.st-ing{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.ctabar{max-width:520px;margin:-8px auto 0;width:100%}}</style>
 <script src="../metrika.js?v=7" async></script>
 </head><body>
 <header class="top" style="margin:0"><a class="logo" href="../"><img src="../icons/icon-192.png" alt="" width="32" height="32"><span>Что приготовить</span></a></header>
 <main class="st">
   <nav class="small muted" aria-label="Навигация"><a href="../">Что приготовить</a> → <a href="./">Все рецепты</a> → Макароны по-флотски</nav>
-  <img src="../img/makarony-po-flotski.webp" alt="Макароны по-флотски">
-  <p class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Navy-style_2020-01-30_%D0%9C%D0%B0%D0%BA%D0%B0%D1%80%D0%BE%D0%BD%D1%8B_%C2%AB%D0%BF%D0%BE-%D1%84%D0%BB%D0%BE%D1%82%D1%81%D0%BA%D0%B8%C2%BB.jpg" rel="noopener">Zuzu172</a>, CC BY-SA 4.0</p>
+  <div class="st-top">
+  <figure class="st-photo"><img src="../img/makarony-po-flotski.webp" alt="Макароны по-флотски">
+  <figcaption class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Navy-style_2020-01-30_%D0%9C%D0%B0%D0%BA%D0%B0%D1%80%D0%BE%D0%BD%D1%8B_%C2%AB%D0%BF%D0%BE-%D1%84%D0%BB%D0%BE%D1%82%D1%81%D0%BA%D0%B8%C2%BB.jpg" rel="noopener">Zuzu172</a>, CC BY-SA 4.0</figcaption></figure>
+  <div class="st-head">
   <h1>Макароны по-флотски</h1>
   <p class="lead">Макароны с обжаренным фаршем и луком, ужин из простых продуктов за полчаса</p>
   <div class="facts"><span class="fact">35 мин</span><span class="fact">4 порц.</span><span class="fact">719 ккал на порцию</span><span class="fact">Б 33 · Ж 31 · У 75</span><span class="fact">Русская кухня</span></div>
   <a class="btn primary cta" id="cta1" href="../#/r/makarony-po-flotski">Открыть в приложении: порции, таймеры, список покупок</a>
-  <section class="card"><h2>Продукты на 4 порц.</h2><ul><li><span>Макароны</span><b>400 г</b></li><li><span>Говяжий фарш</span><b>500 г</b></li><li><span>Лук репчатый</span><b>2 шт</b></li><li><span>Растительное масло</span><b>1,5 ст. л.</b></li><li><span>Вода</span><b>3000 мл</b></li><li><span>Соль</span><b>1 ст. л.</b></li><li><span>Перец чёрный молотый</span><b>2 щеп.</b></li></ul></section>
+  </div></div>
+  <div class="st-cols">
+  <section class="card st-ing"><h2>Продукты на 4 порц.</h2><ul><li><span>Макароны</span><b>400 г</b></li><li><span>Говяжий фарш</span><b>500 г</b></li><li><span>Лук репчатый</span><b>2 шт</b></li><li><span>Растительное масло</span><b>1,5 ст. л.</b></li><li><span>Вода</span><b>3000 мл</b></li><li><span>Соль</span><b>1 ст. л.</b></li><li><span>Перец чёрный молотый</span><b>2 щеп.</b></li></ul></section>
   <section class="card"><h2>Как готовить</h2><ol><li>Поставьте кипятить воду для макарон.</li><li>Лук нарежьте мелким кубиком и обжарьте на масле на среднем огне 5 минут до мягкости.</li><li>Добавьте фарш, разбивайте его лопаткой на мелкие кусочки. Жарьте 10-12 минут, пока фарш не потеряет розовый цвет и не начнёт подрумяниваться.</li><li>Посолите фарш 1 ч. л. соли и поперчите.</li><li>Остальную соль бросьте в кипящую воду, всыпьте макароны и варите по времени на пачке минус 1 минуту. Откиньте на дуршлаг, оставив 100 мл воды.</li><li>Выложите макароны к фаршу, влейте оставленную воду и прогрейте всё вместе 2 минуты, перемешивая.</li></ol><div class="tip"><b>Совет.</b> Немного воды от варки макарон связывает фарш с макаронами, и блюдо не получается сухим. Лишнее масло не нужно.</div></section>
+  </div>
   <div class="ctabar off" id="ctabar"><a class="btn primary cta" href="../#/r/makarony-po-flotski">Открыть в приложении: порции, таймеры, список покупок</a></div>
   <script>(function(){var a=document.getElementById('cta1'),b=document.getElementById('ctabar');function f(){b.classList.toggle('off',a.getBoundingClientRect().bottom>0)}addEventListener('scroll',f,{passive:true});f()})()</script>
   <p class="small muted"><a href="./">Все рецепты</a></p>

@@ -178,6 +178,13 @@ main { outline: none; }
 .hint-examples button:hover { color: var(--accent); }
 
 .filters { display: grid; gap: 4px; align-content: start; }
+/* телефон и планшет: фильтры под кнопкой, рецепты видны сразу после подборок */
+.filters-toggle { display: flex; align-items: center; gap: 8px; justify-content: flex-start; width: 100%; font-weight: 700; }
+.filters-toggle .fcount:not(:empty) { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--accent); color: var(--accent-text); font-size: 13px; display: inline-grid; place-items: center; }
+.filters-toggle .chev { margin-left: auto; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .2s; }
+.filters-toggle[aria-expanded="true"] .chev { transform: rotate(-135deg); }
+.filters.collapsed { display: none; }
+@media (min-width: 1000px) { .filters-toggle { display: none; } .filters.collapsed { display: grid; } }
 .fgroup { border-bottom: 1px solid var(--line); }
 .fgroup:last-child { border-bottom: 0; }
 .fgroup > summary {
@@ -235,6 +242,12 @@ main { outline: none; }
 .rcard .ph .fallback { position: absolute; inset: 0; display: grid; place-items: center; font-size: 46px; color: var(--muted); }
 .rcard .pill { z-index: 2; position: absolute; left: 8px; top: 8px; background: rgb(0 0 0 / .62); color: #fff; font-size: var(--fs-xs); padding: 3px 8px; border-radius: 999px; }
 .rcard .pill.ok { background: var(--ok); }
+/* подписи на фото: время и пометка (постное, детям…) — светлые «таблетки» внизу слева */
+.rcard .ph-badges { z-index: 2; position: absolute; left: 8px; bottom: 8px; right: 8px; display: flex; gap: 6px; flex-wrap: wrap; pointer-events: none; }
+.rcard .ph-badges span { display: inline-flex; align-items: center; gap: 4px; background: rgb(255 255 255 / .92); color: #2a221c; font-size: var(--fs-xs); font-weight: 600; padding: 3px 9px; border-radius: 999px; box-shadow: 0 1px 4px rgb(0 0 0 / .18); }
+.rcard .ph-badges .ic { width: 14px; height: 14px; }
+.grid:not(.as-list) .rcard .meta .m-time { display: none; }
+.grid.as-list .rcard .ph-badges { display: none; }
 .rcard .body { padding: 12px 14px 14px; display: grid; gap: 6px; align-content: start; }
 .rcard h3 { font-size: var(--fs-m); }
 .meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: var(--fs-xs); color: var(--muted); }

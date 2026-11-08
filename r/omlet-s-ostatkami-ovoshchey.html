@@ -16,20 +16,30 @@
 /* кнопка «в приложение» висит внизу экрана на подложке цвета страницы: текст уходит под неё плавно, а не режется */
 .cta{display:block;text-align:center}
 .ctabar{position:sticky;bottom:0;margin:-8px -16px 0;padding:28px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,var(--bg) 26px);transition:opacity .2s}
-.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}</style>
+.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}
+.st-top,.st-cols,.st-head{display:grid;gap:16px;align-content:start}.st-photo{margin:0;display:grid;gap:6px}.st ol li{line-height:1.55}
+/* компьютер: фото и описание рядом, ниже продукты слева (не уезжают при прокрутке) и шаги справа — как в приложении */
+@media (min-width:1000px){.st{max-width:1180px;padding:24px}.st-top{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
+.st-cols{grid-template-columns:380px minmax(0,1fr);align-items:start}.st-ing{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.ctabar{max-width:520px;margin:-8px auto 0;width:100%}}</style>
 <script src="../metrika.js?v=7" async></script>
 </head><body>
 <header class="top" style="margin:0"><a class="logo" href="../"><img src="../icons/icon-192.png" alt="" width="32" height="32"><span>Что приготовить</span></a></header>
 <main class="st">
   <nav class="small muted" aria-label="Навигация"><a href="../">Что приготовить</a> → <a href="./">Все рецепты</a> → Омлет с остатками овощей</nav>
-  <img src="../img/omlet-s-ostatkami-ovoshchey.webp" alt="Омлет с остатками овощей">
-  <p class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Ejjeh.jpg" rel="noopener">Esoterisme</a>, CC BY-SA 4.0</p>
+  <div class="st-top">
+  <figure class="st-photo"><img src="../img/omlet-s-ostatkami-ovoshchey.webp" alt="Омлет с остатками овощей">
+  <figcaption class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Ejjeh.jpg" rel="noopener">Esoterisme</a>, CC BY-SA 4.0</figcaption></figure>
+  <div class="st-head">
   <h1>Омлет с остатками овощей</h1>
   <p class="lead">Сытный омлет с вчерашней картошкой, половинкой перца и помидором</p>
   <div class="facts"><span class="fact">15 мин</span><span class="fact">2 порц.</span><span class="fact">361 ккал на порцию</span><span class="fact">Б 18 · Ж 23 · У 21</span><span class="fact">Интернациональная кухня</span></div>
   <a class="btn primary cta" id="cta1" href="../#/r/omlet-s-ostatkami-ovoshchey">Открыть в приложении: порции, таймеры, список покупок</a>
-  <section class="card"><h2>Продукты на 2 порц.</h2><ul><li><span>Яйцо куриное</span><b>4 шт</b></li><li><span>Молоко</span><b>80 мл</b></li><li><span>Картофель отварной / пюре (остался)</span><b>150 г</b></li><li><span>Перец болгарский</span><b>0,5 шт</b></li><li><span>Помидоры</span><b>1 шт</b></li><li><span>Лук репчатый</span><b>0,5 шт</b></li><li><span>Сыр твёрдый <small>по желанию</small></span><b>40 г</b></li><li><span>Растительное масло</span><b>1 ст. л.</b></li><li><span>Соль</span><b>1 щеп.</b></li><li><span>Перец чёрный молотый</span><b>по вкусу</b></li><li><span>Укроп <small>по желанию</small></span><b>по вкусу</b></li></ul></section>
+  </div></div>
+  <div class="st-cols">
+  <section class="card st-ing"><h2>Продукты на 2 порц.</h2><ul><li><span>Яйцо куриное</span><b>4 шт</b></li><li><span>Молоко</span><b>80 мл</b></li><li><span>Картофель отварной / пюре (остался)</span><b>150 г</b></li><li><span>Перец болгарский</span><b>0,5 шт</b></li><li><span>Помидоры</span><b>1 шт</b></li><li><span>Лук репчатый</span><b>0,5 шт</b></li><li><span>Сыр твёрдый <small>по желанию</small></span><b>40 г</b></li><li><span>Растительное масло</span><b>1 ст. л.</b></li><li><span>Соль</span><b>1 щеп.</b></li><li><span>Перец чёрный молотый</span><b>по вкусу</b></li><li><span>Укроп <small>по желанию</small></span><b>по вкусу</b></li></ul></section>
   <section class="card"><h2>Как готовить</h2><ol><li>Нарежьте отварной картофель кружками, перец и лук мелким кубиком, помидор дольками.</li><li>Разогрейте масло на сковороде на среднем огне. Обжарьте лук с перцем 3 минуты, добавьте картофель и жарьте ещё 3-4 минуты до румяности.</li><li>Взбейте вилкой яйца с молоком и солью.</li><li>Разложите на овощах помидор, залейте яичной смесью и посыпьте тёртым сыром.</li><li>Накройте крышкой, убавьте огонь до слабого и готовьте 5-7 минут, пока верх не схватится и не перестанет быть жидким. Посыпьте перцем и укропом.</li></ol><div class="tip"><b>Совет.</b> Подойдут любые остатки: кабачок, брокколи, горошек, кусочек колбасы. Варёные овощи кладите сразу к картофелю, сырые сначала обжарьте.</div></section>
+  </div>
   <div class="ctabar off" id="ctabar"><a class="btn primary cta" href="../#/r/omlet-s-ostatkami-ovoshchey">Открыть в приложении: порции, таймеры, список покупок</a></div>
   <script>(function(){var a=document.getElementById('cta1'),b=document.getElementById('ctabar');function f(){b.classList.toggle('off',a.getBoundingClientRect().bottom>0)}addEventListener('scroll',f,{passive:true});f()})()</script>
   <p class="small muted"><a href="./">Все рецепты</a></p>

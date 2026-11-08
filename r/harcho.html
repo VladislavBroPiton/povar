@@ -16,20 +16,30 @@
 /* кнопка «в приложение» висит внизу экрана на подложке цвета страницы: текст уходит под неё плавно, а не режется */
 .cta{display:block;text-align:center}
 .ctabar{position:sticky;bottom:0;margin:-8px -16px 0;padding:28px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,var(--bg) 26px);transition:opacity .2s}
-.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}</style>
+.ctabar .cta{box-shadow:0 4px 14px rgba(0,0,0,.12)}.ctabar.off{opacity:0;pointer-events:none}
+.st-top,.st-cols,.st-head{display:grid;gap:16px;align-content:start}.st-photo{margin:0;display:grid;gap:6px}.st ol li{line-height:1.55}
+/* компьютер: фото и описание рядом, ниже продукты слева (не уезжают при прокрутке) и шаги справа — как в приложении */
+@media (min-width:1000px){.st{max-width:1180px;padding:24px}.st-top{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
+.st-cols{grid-template-columns:380px minmax(0,1fr);align-items:start}.st-ing{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.ctabar{max-width:520px;margin:-8px auto 0;width:100%}}</style>
 <script src="../metrika.js?v=7" async></script>
 </head><body>
 <header class="top" style="margin:0"><a class="logo" href="../"><img src="../icons/icon-192.png" alt="" width="32" height="32"><span>Что приготовить</span></a></header>
 <main class="st">
   <nav class="small muted" aria-label="Навигация"><a href="../">Что приготовить</a> → <a href="./">Все рецепты</a> → Суп харчо</nav>
-  <img src="../img/harcho.webp" alt="Суп харчо">
-  <p class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Kharcho_meat_soup.jpg" rel="noopener">A.Savin</a>, CC BY-SA 3.0</p>
+  <div class="st-top">
+  <figure class="st-photo"><img src="../img/harcho.webp" alt="Суп харчо">
+  <figcaption class="small muted">Фото: <a href="https://commons.wikimedia.org/wiki/File:Kharcho_meat_soup.jpg" rel="noopener">A.Savin</a>, CC BY-SA 3.0</figcaption></figure>
+  <div class="st-head">
   <h1>Суп харчо</h1>
   <p class="lead">Густой грузинский суп из говядины с рисом, орехами, чесноком и кинзой</p>
   <div class="facts"><span class="fact">120 мин</span><span class="fact">6 порц.</span><span class="fact">345 ккал на порцию</span><span class="fact">Б 23 · Ж 19 · У 21</span><span class="fact">Кавказская кухня</span></div>
   <a class="btn primary cta" id="cta1" href="../#/r/harcho">Открыть в приложении: порции, таймеры, список покупок</a>
-  <section class="card"><h2>Продукты на 6 порц.</h2><ul><li><span>Говядина</span><b>600 г</b></li><li><span>Вода</span><b>2,5 л</b></li><li><span>Рис</span><b>0,5 стак.</b></li><li><span>Лук репчатый</span><b>3 шт</b></li><li><span>Томатная паста</span><b>2 ст. л.</b></li><li><span>Грецкие орехи</span><b>60 г</b></li><li><span>Чеснок</span><b>4 зуб.</b></li><li><span>Хмели-сунели</span><b>1 ч. л.</b></li><li><span>Лавровый лист</span><b>2 шт</b></li><li><span>Острый перец молотый <small>по желанию</small></span><b>1 щеп.</b></li><li><span>Кинза</span><b>1 пучок</b></li><li><span>Соль</span><b>2 ч. л.</b></li><li><span>Перец чёрный молотый</span><b>1 щеп.</b></li></ul></section>
+  </div></div>
+  <div class="st-cols">
+  <section class="card st-ing"><h2>Продукты на 6 порц.</h2><ul><li><span>Говядина</span><b>600 г</b></li><li><span>Вода</span><b>2,5 л</b></li><li><span>Рис</span><b>0,5 стак.</b></li><li><span>Лук репчатый</span><b>3 шт</b></li><li><span>Томатная паста</span><b>2 ст. л.</b></li><li><span>Грецкие орехи</span><b>60 г</b></li><li><span>Чеснок</span><b>4 зуб.</b></li><li><span>Хмели-сунели</span><b>1 ч. л.</b></li><li><span>Лавровый лист</span><b>2 шт</b></li><li><span>Острый перец молотый <small>по желанию</small></span><b>1 щеп.</b></li><li><span>Кинза</span><b>1 пучок</b></li><li><span>Соль</span><b>2 ч. л.</b></li><li><span>Перец чёрный молотый</span><b>1 щеп.</b></li></ul></section>
   <section class="card"><h2>Как готовить</h2><ol><li>Говядину (лучше грудинку на кости) залейте холодной водой и доведите до кипения на сильном огне. Снимите пену.</li><li>Убавьте огонь до слабого и варите 1,5 часа, пока мясо не станет мягким.</li><li>Выньте мясо, отделите от кости, нарежьте кусочками и верните в бульон.</li><li>Добавьте мелко порубленный лук и промытый рис, варите 15 минут на среднем огне.</li><li>Орехи измельчите в крошку. Добавьте в суп томатную пасту, орехи, хмели-сунели, лавровый лист, острый перец и соль. Варите 5 минут.</li><li>Всыпьте раздавленный чеснок и рубленую кинзу, выключите огонь и дайте настояться под крышкой 10 минут.</li></ol><div class="tip"><b>Совет.</b> В классическом харчо кислоту дают соус ткемали или сушёная алыча. Если они есть, добавьте 3-4 ст. л. ткемали вместо половины томатной пасты, вкус будет настоящим.</div></section>
+  </div>
   <div class="ctabar off" id="ctabar"><a class="btn primary cta" href="../#/r/harcho">Открыть в приложении: порции, таймеры, список покупок</a></div>
   <script>(function(){var a=document.getElementById('cta1'),b=document.getElementById('ctabar');function f(){b.classList.toggle('off',a.getBoundingClientRect().bottom>0)}addEventListener('scroll',f,{passive:true});f()})()</script>
   <p class="small muted"><a href="./">Все рецепты</a></p>

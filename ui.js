@@ -209,6 +209,12 @@ function photo(r, small) {
   if (r.img) return `<img src="${esc(small && r.th ? r.th : r.img)}" alt="${esc(r.t)}" loading="lazy" decoding="async" onerror="this.remove()">`;
   return '';
 }
+// подписи поверх фото карточки: время и одна главная пометка — видно при быстром просмотре ленты
+function phBadges(r) {
+  const tags = r.tags || [], occ = r.occ || [];
+  const mark = occ.includes('post') ? 'Постное' : tags.includes('kids') ? 'Детям' : tags.includes('spicy') ? 'Острое' : tags.includes('leftover') ? 'Из остатков' : '';
+  return `<div class="ph-badges"><span class="b-time">${IC.timer}${r.time} мин</span>${mark ? `<span>${mark}</span>` : ''}</div>`;
+}
 function starsText(id) { const n = S.notes[id] && S.notes[id].s; return n ? '★'.repeat(n) : ''; }
 function card(row, H) {
   const r = row.r;
@@ -221,10 +227,10 @@ function card(row, H) {
   const pill = H.size && !row.miss.length ? '<span class="pill ok">Всё есть</span>' : H.size ? `<span class="pill">Не хватает ${row.miss.length}</span>` : r.own ? '<span class="pill">Мой рецепт</span>' : '';
   const st = starsText(r.id);
   return `<a class="rcard" href="#/r/${esc(r.id)}">
-    <div class="ph"><span class="fallback" aria-hidden="true">${KIND_ICON[r.kind] || '🍽️'}</span>${photo(r, true)}${pill}</div>
+    <div class="ph"><span class="fallback" aria-hidden="true">${KIND_ICON[r.kind] || '🍽️'}</span>${photo(r, true)}${pill}${phBadges(r)}</div>
     <div class="body">
       <h3>${esc(r.t)}</h3>
-      <div class="meta"><span>⏱ ${r.time} мин</span><span>${Math.round(r.ps[0])} ккал</span><span>Б ${Math.round(r.ps[1])} · Ж ${Math.round(r.ps[2])} · У ${Math.round(r.ps[3])}</span>${priceOn() && r.cost ? `<span>≈ ${fmtRub(r.cost * coef())} / порция</span>` : ''}${st ? `<span class="stars">${st}</span>` : ''}</div>
+      <div class="meta"><span class="m-time">⏱ ${r.time} мин</span><span>${Math.round(r.ps[0])} ккал</span><span>Б ${Math.round(r.ps[1])} · Ж ${Math.round(r.ps[2])} · У ${Math.round(r.ps[3])}</span>${priceOn() && r.cost ? `<span>≈ ${fmtRub(r.cost * coef())} / порция</span>` : ''}${st ? `<span class="stars">${st}</span>` : ''}</div>
       ${algHTML(r)}
       ${need}
     </div></a>`;
@@ -269,6 +275,7 @@ const IC = {
   pen: ic('<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>'),
   list: ic('<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>'),
   grid: ic('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+  filter: ic('<path d="M4 6h16M7 12h10M10 18h4"/>'),
 };
 const ci = (cls, body) => `<svg class="ci ${cls}" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
 const COLL_ICON = {
@@ -313,6 +320,8 @@ function socialHTML() {
 }
 const EXAMPLES = ['ужин из курицы в духовке на 4', 'есть яйца, молоко и мука', 'высокобелковый завтрак', 'суп без мяса', 'на пару для ребёнка 1 год', 'кашерный ужин на 10 гостей', 'грузинская кухня', 'что сделать из вчерашнего риса'];
 let titleWords = [], lastNotice = '', shown = 24;
+// на телефоне и планшете фильтры спрятаны под кнопку «Фильтры» (иначе до рецептов листать девять разделов); на компьютере — колонка слева
+let filtersOpen = false;
 function renderFind() {
   SEASON_NOW.clear(); seasonNow(S.city).forEach(id => SEASON_NOW.add(id));
   const s = S.serv || 0;
@@ -338,7 +347,8 @@ function renderFind() {
     <section class="colls" aria-label="Подборки">
       ${collOrder.map(k => `<button type="button" class="coll${S.occ === k ? ' on' : ''}${now.includes(k) ? ' now' : ''}" data-coll="${k}"><span aria-hidden="true">${COLL_ICON[k]}</span>${esc(COLLS[k].n)}${now.includes(k) ? '<small>сейчас</small>' : ''}</button>`).join('')}
     </section>
-    <aside class="side card filters" aria-label="Фильтры">
+    <button type="button" class="btn filters-toggle" id="filtersToggle" aria-controls="filtersBox" aria-expanded="${filtersOpen}">${IC.filter}Фильтры<span class="fcount" id="fcount"></span><span class="chev" aria-hidden="true"></span></button>
+    <aside class="side card filters${filtersOpen ? '' : ' collapsed'}" id="filtersBox" aria-label="Фильтры">
       <details class="fgroup"${wide() ? ' open' : ''}><summary>Что есть дома <span class="sum" data-sum="have"></span></summary><div class="fbody tagbox" data-box="have">
         <div class="ac"><input class="input" data-ac="have" placeholder="Добавить продукт: яйца, фарш…" autocomplete="off"><div class="ac-list" hidden></div></div>
         <div class="chips" data-tags="have">${tagsHTML('have')}</div>
@@ -428,6 +438,9 @@ function summaries() {
   set('diets', S.diets.map(k => DIETS[k]).join(', '));
   set('cuisine', S.cuisine.map(k => CUISINES[k]).join(', '));
   set('serv', [S.serv ? S.serv + ' чел.' : '', S.time ? 'до ' + S.time + ' мин' : ''].filter(Boolean).join(', '));
+  // на кнопке «Фильтры» — сколько разделов заполнено: видно, что фильтры действуют, даже когда они свёрнуты
+  const n = $$('[data-sum]').filter(el => el.textContent.trim()).length, fc = $('#fcount');
+  if (fc) fc.textContent = n ? String(n) : '';
 }
 function searchQueryText() {
   const parts = [];
@@ -528,6 +541,11 @@ function bindFind() {
   $('#askForm').addEventListener('submit', e => { e.preventDefault(); applyPhrase($('#askQ').value.trim()); });
   const mic = $('#micBtn');
   if (mic) mic.addEventListener('click', listen);
+  $('#filtersToggle').addEventListener('click', e => {
+    filtersOpen = !filtersOpen;
+    $('#filtersBox').classList.toggle('collapsed', !filtersOpen);
+    e.currentTarget.setAttribute('aria-expanded', filtersOpen);
+  });
   root.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.ex) { $('#askQ').value = b.dataset.ex; applyPhrase(b.dataset.ex); return; }
