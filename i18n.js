@@ -30,6 +30,10 @@ window.LANG = LANG;
   }
   // короткие надписи встречаются и со строчной буквы («Аллергены: орехи»)
   for (const [k, v] of Object.entries(DICT)) if (k.length < 30 && /^[А-ЯЁ]/.test(k) && !DICT[k.toLowerCase()]) DICT[k.toLowerCase()] = v.charAt(0).toLowerCase() + v.slice(1);
+  // запасные названия рецептов, пока сервер не прислал полный перевод: короткое английское имя блюда из данных
+  // (иначе название переводится по словам — «Salad из свежих овощей»). Ответ сервера пишется в DICT и главнее.
+  const TITLES = {};
+  for (const r of window.RECIPES || []) if (r.en) TITLES[r.t] = r.en.charAt(0).toUpperCase() + r.en.slice(1);
   for (const c of window.CITIES_RAW) { const en = c[4].split(',')[0]; DICT[c[0]] = en.replace(/(^|[\s-])\S/g, s => s.toUpperCase()); }
   const UNITS = { 'шт': 'pcs', 'ст. л.': 'tbsp', 'ч. л.': 'tsp', 'зуб.': 'cloves', 'щеп.': 'pinch', 'стак.': 'cups', 'пучок': 'bunch', 'г': 'g', 'мл': 'ml', 'кг': 'kg', 'л': 'l' };
   const PATTERNS = [
@@ -74,7 +78,7 @@ window.LANG = LANG;
     const key = s.trim();
     if (!key || !/[А-Яа-яЁё]/.test(key)) return s;
     if (cache.has(key)) return s.replace(key, cache.get(key));
-    let out = DICT[key];
+    let out = DICT[key] || TITLES[key];
     if (!out) for (const [re, fn] of PATTERNS) { const m = key.match(re); if (m) { out = fn(...m); break; } }
     if (!out && fragRe) out = key.replace(fragRe, k => DICT[k]);
     cache.set(key, out);
@@ -142,7 +146,8 @@ window.LANG = LANG;
   const tkey = 'cook.en.titles.' + (window.RECIPES || []).length;
   const titles = load(tkey);
   if (titles) for (const [id, d] of Object.entries(titles)) addRecipe(id, d);
-  else if (API) fetch(API + '/api/translate-titles').then(r => r.ok ? r.json() : null).then(d => { if (!d) return; store(tkey, d); for (const [id, x] of Object.entries(d)) addRecipe(id, x); retranslate(); }).catch(() => { /* останутся русские названия */ });
+  // в память браузера — только полный набор: неполный (сервер ещё переводит новые рецепты) запрошу при следующем заходе
+  else if (API) fetch(API + '/api/translate-titles').then(r => r.ok ? r.json() : null).then(d => { if (!d) return; if (Object.keys(d).length >= (window.RECIPES || []).length) store(tkey, d); for (const [id, x] of Object.entries(d)) addRecipe(id, x); retranslate(); }).catch(() => { /* останутся русские названия */ });
   async function recipeSteps() {
     const m = location.hash.match(/^#\/r\/([\w-]+)/);
     if (!m || !API || m[1].startsWith('my-') || m[1].startsWith('ai-')) return;
