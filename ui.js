@@ -715,7 +715,7 @@ function drawRecipe(r) {
     const st = itemStatus(it.id, H);
     const off = it.opt && conflict(it);
     if (!it.opt && st.s === 'miss') missing.push(it);
-    const mark = st.s === 'have' ? '<span class="st have" title="есть">✓</span>' : st.s === 'sub' ? '<span class="st have" title="есть замена">≈</span>' : st.s === 'basic' ? '<span class="st basic">•</span>' : '<span class="st miss" title="нет">!</span>';
+    const mark = st.s === 'have' ? '<span class="st have" title="есть">✓</span>' : st.s === 'sub' ? '<span class="st have" title="есть замена">≈</span>' : st.s === 'basic' ? '<span class="st basic">•</span>' : '<span class="st miss" title="нет"></span>';
     const notes = [];
     if (st.s === 'sub') notes.push(`<span class="sub">у вас есть замена: ${esc(ING[st.by].n.toLowerCase())}</span>`);
     if (off) notes.push('<span class="sub warn">не подходит под ваши ограничения, пропустите</span>');
