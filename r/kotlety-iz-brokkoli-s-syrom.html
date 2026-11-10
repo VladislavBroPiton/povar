@@ -21,7 +21,9 @@
 /* компьютер: фото и описание рядом, ниже продукты слева (не уезжают при прокрутке) и шаги справа — как в приложении */
 @media (min-width:1000px){.st{max-width:1180px;padding:24px}.st-top{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:center}
 .st-cols{grid-template-columns:380px minmax(0,1fr);align-items:start}.st-ing{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
-.ctabar{max-width:520px;margin:-8px auto 0;width:100%}}</style>
+.ctabar{max-width:520px;margin:-8px auto 0;width:100%}}
+/* телефон боком: экран низкий, фото на всю ширину закрывало название — ставлю их рядом */
+@media (min-width:640px) and (max-width:999px) and (orientation:landscape){.st-top{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:center}}</style>
 <script src="../metrika.js?v=7" async></script>
 </head><body>
 <header class="top" style="margin:0"><a class="logo" href="../"><img src="../icons/icon-192.png" alt="" width="32" height="32"><span>Что приготовить</span></a></header>
