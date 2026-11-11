@@ -267,6 +267,15 @@ main { outline: none; }
 .fact.ok { background: var(--ok-soft); color: var(--ok); }
 .fact.warn { background: var(--warn-soft); color: var(--warn); }
 .r-cols { display: grid; gap: var(--gap); }
+/* БЖУ в карточке рецепта: свёрнуто, в заголовке — краткая строка на порцию */
+.nutr-box { border-top: 1px solid var(--line); margin-top: 12px; }
+.nutr-box > summary { list-style: none; cursor: pointer; padding: 12px 0; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--fs-l, 1.1rem); }
+.nutr-box > summary::-webkit-details-marker { display: none; }
+.nutr-box > summary::after { content: ""; flex: none; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); margin: 0 4px 4px 0; transition: transform .2s; }
+.nutr-box[open] > summary::after { transform: rotate(-135deg); margin-bottom: -4px; }
+.nutr-box .sum { font-weight: 400; color: var(--muted); font-size: var(--fs-s); margin-left: auto; text-align: right; }
+.nutr-box[open] .sum { visibility: hidden; }
+.nutr-box > .seg { margin-bottom: 10px; }
 .nutr { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .nutr div { background: var(--surface-2); border-radius: var(--r-sm); padding: 10px 6px; text-align: center; }
 .nutr b { display: block; font-size: var(--fs-l); }

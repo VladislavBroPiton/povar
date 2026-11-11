@@ -90,19 +90,30 @@ function localCuisine(city) {
 }
 
 // ---------- Рецепты ----------
+// сколько воды впитывает 1 г сухой крупы, макарон, бобовых при варке (готовые весят в 2-4 раза больше)
+const SOAK = { rice: 1.7, buckwheat: 1.8, oats: 1.5, semolina: 3, millet: 2, bulgur: 1.5, couscous: 1.2, pearl_barley: 2, quinoa: 1.8, corn_grits: 3,
+  pasta: 1.2, rice_noodles: 1.5, egg_noodles: 1.2, lentils_red: 1.5, lentils: 1.5, chickpeas: 1.5, beans: 1.5, peas_dry: 1.5 };
+const MILKY = new Set(['milk', 'plant_milk', 'coconut_milk', 'cream']);
 function prepRecipe(r) {
   r.tags = r.tags || [];
   r.items = r.ing.filter(x => ING[x[0]]).map(([id, g, u, q, o]) => ({ id, g, u, q, opt: !!o }));
   const req = r.items.filter(i => !i.opt);
   const tot = [0, 0, 0, 0];
   let w = 0, cost = 0;
+  let water = 0, soak = 0;
   for (const i of req) {
     const e = ING[i.id].e;
     for (let k = 0; k < 4; k++) tot[k] += e[k] * i.g / 100;
-    w += i.g;
+    if (i.id === 'water') water += i.g; else w += i.g;
+    soak += (SOAK[i.id] || 0) * i.g;
+    if (MILKY.has(i.id)) soak -= i.g;  // каша на молоке: крупа впитывает молоко, оно уже в весе
     cost += (PRICE[i.id] || 0) * i.g / 1000;
   }
-  r.tot = tot; r.w = w;
+  // вес готового блюда для «на 100 г»: в супе и напитке вода остаётся вся; в остальном вместо воды из рецепта
+  // беру ту, что впитали крупа и макароны (лишняя вода от варки сливается или выкипает)
+  // (в тушёном без круп примерно половина воды остаётся подливкой)
+  const keep = r.kind === 'soup' || r.kind === 'drink' ? water : soak > 0 ? soak : (r.m || []).includes('stew') ? water / 2 : 0;
+  r.tot = tot; r.w = w + keep;
   r.ps = tot.map(v => v / r.serv);
   r.cost = cost / r.serv;
   const cats = new Set(req.map(i => ING[i.id].cat));

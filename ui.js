@@ -664,12 +664,14 @@ function listen() {
 }
 
 // ---------- Экран рецепта ----------
-let curServ = 0, nutMode = 'serv', wakeLock = null, panK = 1, panD = 0;
+// печать через меню браузера тоже раскрывает БЖУ
+addEventListener('beforeprint', () => document.querySelectorAll('.nutr-box').forEach(d => { d.open = true; }));
+let curServ = 0, nutMode = 'serv', nutOpen = false, wakeLock = null, panK = 1, panD = 0;
 function renderRecipe(id) {
   const r = RBYID[id];
   if (!r) { app.innerHTML = `<div class="page"><div class="empty">${EMPTY_SVG.pot}<p>Рецепт не найден</p><a class="btn" href="#/">К подбору</a></div></div>`; return; }
   curServ = S.serv || r.serv;
-  nutMode = 'serv'; panK = 1; panD = 0;
+  nutMode = 'serv'; nutOpen = false; panK = 1; panD = 0;
   drawRecipe(r);
   document.title = r.t + ' — Что приготовить';
   loadGallery(r);
@@ -772,10 +774,10 @@ function drawRecipe(r) {
         ${panHTML(r)}
         <ul class="ings">${ingRows}</ul>
         ${missing.length ? `<div class="row"><button class="btn primary" type="button" id="toList">Добавить ${missing.length} в список покупок</button><button class="btn" type="button" id="orderMiss">Заказать недостающее</button></div>` : H.size ? '<div class="notice ok">Всё нужное у вас есть</div>' : ''}
-        <h3>БЖУ</h3>
+        <details class="nutr-box"${nutOpen ? ' open' : ''}><summary><span>БЖУ</span><span class="sum">${Math.round(r.ps[0])} ккал · Б ${Math.round(r.ps[1])} · Ж ${Math.round(r.ps[2])} · У ${Math.round(r.ps[3])} на порцию</span></summary>
         <div class="seg" role="group" aria-label="БЖУ на">${[['serv', 'на порцию'], ['all', 'на всё блюдо'], ['100', 'на 100 г']].map(([v, n]) => `<button type="button" data-nm="${v}" class="${nutMode === v ? 'on' : ''}">${n}</button>`).join('')}</div>
         <div class="nutr"><div><b>${Math.round(nut[0])}</b><span>ккал</span></div><div><b>${fmtN(nut[1])}</b><span>белки, г</span></div><div><b>${fmtN(nut[2])}</b><span>жиры, г</span></div><div><b>${fmtN(nut[3])}</b><span>углеводы, г</span></div></div>
-        <p class="small muted">Расчёт по средним значениям продуктов, без необязательных. Цены примерные, средние по ${priceOn() ? 'региону' : 'России'}</p>
+        <p class="small muted">Расчёт по средним значениям продуктов, без необязательных. Цены примерные, средние по ${priceOn() ? 'региону' : 'России'}</p></details>
       </section>
       <section class="card">
         <h2>Как готовить</h2>
@@ -844,6 +846,8 @@ function bindRecipe(r) {
   // ползунок: пока тянут — меняю только число, отпустили — пересчитываю продукты
   root.addEventListener('input', e => { if (e.target.matches('[data-rsr]')) { const o = $('.r-cols .stepper output'); if (o) o.textContent = e.target.value; } });
   root.addEventListener('change', e => { if (e.target.matches('[data-rsr]')) { curServ = +e.target.value; drawRecipe(r); loadGallery(r); } });
+  // свёрнут ли блок БЖУ — помню, пока открыт этот рецепт (иначе переключение «на порцию / на 100 г» его сворачивало)
+  root.addEventListener('toggle', e => { if (e.target.classList?.contains('nutr-box')) nutOpen = e.target.open; }, true);
   root.addEventListener('click', async e => {
     const b = e.target.closest('button, [data-back], li[data-step]');
     if (!b) return;
@@ -859,7 +863,7 @@ function bindRecipe(r) {
     if (b.id === 'cookBtn') { openCook(r); return; }
     if (b.id === 'cookedBtn') { track('cooked', { id: r.id }); const c = ((S.notes[r.id] || {}).c || 0) + 1; setNote(r.id, { c, last: new Date().toISOString().slice(0, 10) }); hook('afterCooked', r, curServ / r.serv * panK); b.textContent = `Я приготовил · ${c} ${plural(c, 'раз', 'раза', 'раз')}`; toast('Отметил. Приятного аппетита!'); return; }
     if (b.id === 'favBtn') { S.fav = S.fav.includes(r.id) ? S.fav.filter(x => x !== r.id) : [...S.fav, r.id]; save(); const on = S.fav.includes(r.id); b.classList.toggle('on-fav', on); b.innerHTML = on ? IC.heartOn + 'В избранном' : IC.heart + 'В избранное'; if (on) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 300 }); return; }
-    if (b.id === 'printBtn') { print(); return; }
+    if (b.id === 'printBtn') { const nb = app.querySelector('.nutr-box'); if (nb) nb.open = true; print(); return; }
     if (b.id === 'shareBtn') {
       const url = r.own ? location.href : BASE + 'r/' + r.id + '.html';
       try { if (navigator.share) await navigator.share({ title: r.t, text: r.d, url }); else { await navigator.clipboard.writeText(url); toast('Ссылка скопирована'); } } catch { /* отмена */ }
