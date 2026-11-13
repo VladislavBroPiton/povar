@@ -92,7 +92,7 @@ svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width:
 .city-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-s); }
 .lang-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 10px; font-size: var(--fs-xs); font-weight: 700; cursor: pointer; color: var(--muted); }
 .lang-btn:hover { color: var(--accent); border-color: var(--accent); }
-.install-btn { border: 0; background: var(--accent); color: var(--accent-text); border-radius: 999px; padding: 7px 14px; font-weight: 600; cursor: pointer; font-size: var(--fs-s); }
+.install-btn { white-space: nowrap; flex: none; border: 0; background: var(--accent); color: var(--accent-text); border-radius: 999px; padding: 7px 14px; font-weight: 600; cursor: pointer; font-size: var(--fs-s); }
 
 .city-confirm {
   /* всплывает над нижним меню, а не вставляется сверху: страница под ней не прыгает */
@@ -427,7 +427,13 @@ body.cooking { overflow: hidden; }
 .cook-nav .btn { min-height: 60px; font-size: var(--fs-l); }
 .cook-nav .btn:disabled { opacity: .4; }
 body.cooking .timer-bar { z-index: 90; bottom: 96px; }
-@media (orientation: landscape) and (max-height: 520px) { .cook-step { padding: 8px 20px; } .cook-step p { font-size: 22px; } .cook-nav .btn { min-height: 46px; } }
+@media (orientation: landscape) and (max-height: 520px) {
+  .cook-step { padding: 8px 20px; } .cook-step p { font-size: 22px; } .cook-nav .btn { min-height: 46px; }
+  /* телефон боком: фото слева, текст шага справа — иначе фото занимает весь экран и текст уходит под кнопки */
+  .cook-step:has(> .cook-img) { grid-template-columns: 38% 1fr; column-gap: 20px; row-gap: 12px; max-width: none; }
+  .cook-step:has(> .cook-img) > .cook-img { grid-row: 1 / span 6; align-self: start; aspect-ratio: 4 / 3; max-height: calc(100dvh - 150px); }
+  .cook-step p { font-size: 20px; }
+}
 
 .fly { position: fixed; z-index: 95; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); pointer-events: none; }
 #toast { position: fixed; left: 50%; top: calc(var(--top-h) + 12px); transform: translateX(-50%); z-index: 100; background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; max-width: calc(100vw - 32px); box-shadow: var(--shadow); }
@@ -581,8 +587,11 @@ html.big .btn { min-height: 48px; }
   .top { margin-left: calc(-72px - env(safe-area-inset-left)); padding-left: calc(84px + env(safe-area-inset-left)); }
   .r-photo { aspect-ratio: 21 / 9; }
   .timer-bar { bottom: 10px; }
+  .cookie-note { left: calc(84px + env(safe-area-inset-left)); transform: none; bottom: calc(10px + env(safe-area-inset-bottom)); }
   .sheet, .sheet-body { max-height: 96vh; }
 }
+/* узкий телефон с кнопкой «На экран» (айфоны 390–440): название не влезает рядом с городом — оставить значок */
+@media (max-width: 440px) { .top:has(.install-btn:not([hidden])) .logo span { display: none; } }
 @media (max-width: 380px) {
   .logo span { display: none; }
   .nutr b { font-size: var(--fs-m); }
